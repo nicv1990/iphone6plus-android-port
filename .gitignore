@@ -1,0 +1,21 @@
+.DS_Store
+
+# Large local checkouts from upstream projects. This repo publishes pointers,
+# credits, notes, and our patch instead of vendoring multi-GB trees.
+hoolock-linux/
+hoolock-m1n1/
+hoolock-docs/
+pmaports/
+pongoOS/
+projectsandcastle/
+tools/
+analysis/
+bin/
+kernel-config/
+aosp-sandcastle 2
+
+# Built payloads and downloaded images are large and device-specific. Keep only
+# README files and text evidence.
+artifacts/*
+!artifacts/README.md
+!artifacts/*.txt

@@ -1,0 +1,4 @@
+
+~ # cat /sys/bus/platform/devices/208040000.ans/akf_decode
+known sequence: 0600000000000012 -> 0600000000000004 -> 00b0000000000010 -> 0070000000000001
+fields: top=high_word[31:24], rtkit_type=high_word[27:20], low16=low_word[15 a2~ # [6n

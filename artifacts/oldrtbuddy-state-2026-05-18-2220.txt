@@ -1,0 +1,83 @@
+ 
+
+
+
+HoolockLinux test ramdisk shell
+
+Logs available in /HL_init.log
+
+~ # [6n
+~ # set -x
+~ # DEV=/sys/bus/platform/devices/208040000.ans
++ DEV=/sys/bus/platform/devices/208040000.ans
+~ # {
+>  echo OLDRTBUDDY_STATE_RUN_START
+>  echo STATE
+>  cat $DEV/state
+>  echo OLD_RTBUDDY_STATE
+>  cat $DEV/oldrtbuddy_state
+>  echo AKF_DECODE
+>  cat $DEV/akf_decode
+>  echo PARTITIONS
+>  cat /proc/partitions
+> } 2>&1
++ echo OLDRTBUDDY_STATE_RUN_START
+OLDRTBUDDY_STATE_RUN_START
++ echo STATE
+STATE
++ cat /sys/bus/platform/devices/208040000.ans/state
+mmio_size=0x2000 pm_ret=0 runtime_status=active
++ echo OLD_RTBUDDY_STATE
+OLD_RTBUDDY_STATE
++ cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_state
+oldrtbuddy_state=v1
+samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001
+seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f
+loop_count=7 repeat_state12=32 iop_state=0004 ap_power_state=0010 iop_ack_state=0001
+last_controls: a2i=0002cc01 i2a=00088901 i2a_empty=0 i2a_full=0
+interpretation=controller is alive but still cycling in old RTBuddy management; endpoint map/start not reached
+next_code_step=implement ordered old RTBuddy management reply path, then ANSEndpoint1 start, before ASPStorage block commands
++ echo AKF_DECODE
+AKF_DECODE
++ cat /sys/bus/platform/devices/208040000.ans/akf_decode
+known sequence: 0600000000000012 -> 0600000000000004 -> 00b0000000000010 -> 0070000000000001
+fields: mgmt_type=msg[59:52], major=msg[63:60], sub=msg[51:48], low16=msg[15:0]
+note: local iOS 12.5.8 RTBuddyManagementEndpoint has old-format branches; this decoder only labels candidates and does not send replies
+00 a2i=0002cc01 i2a=000a9901 empty=1 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+01 a2i=0002cc01 i2a=0008a901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+02 a2i=0002cc01 i2a=0008b901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+03 a2i=0002cc01 i2a=0008c901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+04 a2i=0002cc01 i2a=0008d901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+05 a2i=0002cc01 i2a=0008e901 empty=0 full=0 msg=0600000000000004 bytes=06:00:00:00:00:00:00:04 hi=06000000 lo=00000004 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0004 payload=000004 low8=04 name=old-iop-state/version-candidate known=observed-boot-1/state-change
+06 a2i=0002cc01 i2a=0008f901 empty=0 full=0 msg=00b0000000000010 bytes=00:b0:00:00:00:00:00:10 hi=00b00000 lo=00000010 top=00 rtkit_type=0b mgmt_type=0b major=0 sub=0 low16=0010 payload=000010 low8=10 name=ap-power-state known=observed-boot-2/ap-power
+07 a2i=0002cc01 i2a=00080901 empty=0 full=0 msg=0070000000000001 bytes=00:70:00:00:00:00:00:01 hi=00700000 lo=00000001 top=00 rtkit_type=07 mgmt_type=07 major=0 sub=0 low16=0001 payload=000001 low8=01 name=iop-power-ack known=observed-boot-3/iop-power-ack
+08 a2i=0002cc01 i2a=00091901 empty=0 full=1 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+09 a2i=0002cc01 i2a=00082901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+10 a2i=0002cc01 i2a=00083901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+11 a2i=0002cc01 i2a=00084901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+12 a2i=0002cc01 i2a=00085901 empty=0 full=0 msg=0600000000000012 bytes=06:00:00:00:00:00:00:12 hi=06000000 lo=00000012 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0012 payload=000012 low8=12 name=old-iop-state/version-candidate known=observed-boot-0/repeated-state
+13 a2i=0002cc01 i2a=00086901 empty=0 full=0 msg=0600000000000004 bytes=06:00:00:00:00:00:00:04 hi=06000000 lo=00000004 top=06 rtkit_type=60 mgmt_type=60 major=0 sub=0 low16=0004 payload=000004 low8=04 name=old-iop-state/version-candidate known=observed-bo+ echo PARTITIONS
+PARTITIONS
++ cat /proc/partitions
+major minor  #blocks  name
+
+   1        0       4096 ram0
+   1        1       4096 ram1
+   1        2       4096 ram2
+   1        3       4096 ram3
+   1        4       4096 ram4
+   1        5       4096 ram5
+   1        6       4096 ram6
+   1        7       4096 ram7
+   1        8       4096 ram8
+   1        9       4096 ram9
+   1       10       4096 ram10
+   1       11       4096 ram11
+   1       12       4096 ram12
+   1       13       4096 ram13
+   1       14       4096 ram14
+   1       15       4096 ram15
+  31        0         16 mtdblock0
+  31        1        128 mtdblock1
+~ # 
+~ # [6n

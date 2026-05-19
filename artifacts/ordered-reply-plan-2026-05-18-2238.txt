@@ -1,0 +1,38 @@
+
+~ # cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_plan
+oldrtbuddy_ordered_reply=v1
+stable=1 samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001 loop_count=7 seen_mask=f
+usage=echo '<phase> <reply-hex64>' > oldrtbuddy_ordered_reply
+phases: state12 expects 0600000000000012, state04 expects 0600000000000004, ap_power10 expects 00b0000000000010, iop_ack01 expects 0070000000000001
+guard=requires stable four-message management loop, matching current phase, exact expected message, and non-full AP-to-IOP mailbox
+next=use this only for ordered RTBuddy management experiments before ANSEndpoint1/ASPStorage work
+~ # cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_state
+oldrtbuddy_state=v1
+samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001
+seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f
+loop_count=7 repeat_state12=32 iop_state=0004 ap_power_state=0010 iop_ack_state=0001
+last_controls: a2i=0002cc01 i2a=00088901 i2a_empty=0 i2a_full=0
+interpretation=controller is alive but still cycling in old RTBuddy management; endpoint map/start not reached
+next_code_step=use oldrtbuddy_plan and oldrtbuddy_ordered_reply for gated management replies, then ANSEndpoint1 start before ASPStorage block commands
+~ # cat /proc/partitions
+major minor  #blocks  name
+
+   1        0       4096 ram0
+   1        1       4096 ram1
+   1        2       4096 ram2
+   1        3       4096 ram3
+   1        4       4096 ram4
+   1        5       4096 ram5
+   1        6       4096 ram6
+   1        7       4096 ram7
+   1        8       4096 ram8
+   1        9       4096 ram9
+   1       10       4096 ram10
+   1       11       4096 ram11
+   1       12       4096 ram12
+   1       13       4096 ram13
+   1       14       4096 ram14
+   1       15       4096 ram15
+  31        0         16 mtdblock0
+  31        1        128 mtdblock1
+~ # [6n

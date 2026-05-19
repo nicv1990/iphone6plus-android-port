@@ -1,0 +1,1191 @@
+diff --git a/arch/arm64/boot/dts/apple/t7000.dtsi b/arch/arm64/boot/dts/apple/t7000.dtsi
+index 2ebdfaa2c..52448e057 100644
+--- a/arch/arm64/boot/dts/apple/t7000.dtsi
++++ b/arch/arm64/boot/dts/apple/t7000.dtsi
+@@ -294,6 +294,20 @@ dwi_bl: backlight@20e200010 {
+ 			status = "disabled";
+ 		};
+ 
++		ans_iop: ans@208040000 {
++			compatible = "apple,t7000-ans-iop-probe", "apple,s5l8960x-ans-iop";
++			reg = <0x2 0x08040000 0x0 0x2000>;
++			interrupt-parent = <&aic>;
++			interrupts = <AIC_IRQ 37 IRQ_TYPE_LEVEL_HIGH>,
++				     <AIC_IRQ 36 IRQ_TYPE_LEVEL_HIGH>,
++				     <AIC_IRQ 39 IRQ_TYPE_LEVEL_HIGH>,
++				     <AIC_IRQ 38 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "send-empty", "send-not-empty",
++					  "recv-empty", "recv-not-empty";
++			power-domains = <&ps_ans>;
++			status = "okay";
++		};
++
+ 		pinctrl: pinctrl@20e300000 {
+ 			compatible = "apple,t7000-pinctrl", "apple,pinctrl";
+ 			reg = <0x2 0x0e300000 0x0 0x100000>;
+diff --git a/drivers/soc/apple/Makefile b/drivers/soc/apple/Makefile
+index 0b85ab61a..1e5974655 100644
+--- a/drivers/soc/apple/Makefile
++++ b/drivers/soc/apple/Makefile
+@@ -11,3 +11,6 @@ apple-sart-y = sart.o
+ 
+ obj-$(CONFIG_APPLE_TUNABLE) += apple-tunable.o
+ apple-tunable-y = tunable.o
++
++obj-$(CONFIG_ARCH_APPLE) += apple-t7000-ans-probe.o
++apple-t7000-ans-probe-y = t7000-ans-probe.o
+diff --git a/drivers/soc/apple/t7000-ans-probe.c b/drivers/soc/apple/t7000-ans-probe.c
+new file mode 100644
+index 000000000..bc9d7ebd9
+--- /dev/null
++++ b/drivers/soc/apple/t7000-ans-probe.c
+@@ -0,0 +1,1149 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Probe-only helper for the Apple T7000 ANS/ASP storage path.
++ *
++ * This does not implement storage. It only proves whether Linux can bind
++ * to the ANS IOP node and power the domain that iOS uses for ASPStorage.
++ */
++
++#include <linux/ioport.h>
++#include <linux/io.h>
++#include <linux/mod_devicetable.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/pm_runtime.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/delay.h>
++
++#define ASC_A2I_CONTROL		0x110
++#define ASC_I2A_CONTROL		0x114
++#define ASC_A2I_SEND0		0x800
++#define ASC_A2I_SEND1		0x808
++#define ASC_I2A_RECV0		0x830
++#define ASC_I2A_RECV1		0x838
++#define ASC_CONTROL_FULL	BIT(16)
++#define ASC_CONTROL_EMPTY	BIT(17)
++#define ASC_CPU_CONTROL		0x044
++#define ASC_CPU_CONTROL_START	BIT(4)
++#define RTKIT_MGMT_TYPE(type)	((u64)(type) << 52)
++#define RTKIT_MGMT_EP		0
++#define RTKIT_MSG_HELLO		1
++#define RTKIT_MSG_HELLO_ACK	2
++#define RTKIT_MSG_IOP_PWR	6
++#define RTKIT_PWR_INIT		0x220
++#define AKF_BASE		0x1000
++#define AKF_A2I_CONTROL		(AKF_BASE + 0x08)
++#define AKF_A2I_SEND0		(AKF_BASE + 0x10)
++#define AKF_A2I_SEND1		(AKF_BASE + 0x14)
++#define AKF_I2A_CONTROL		(AKF_BASE + 0x20)
++#define AKF_I2A_RECV0		(AKF_BASE + 0x38)
++#define AKF_I2A_RECV1		(AKF_BASE + 0x3c)
++#define AKF_CONTROL_FULL	BIT(16)
++#define AKF_CONTROL_EMPTY	BIT(17)
++#define AKF_KNOWN_BOOT_0	0x0600000000000012ULL
++#define AKF_KNOWN_BOOT_1	0x0600000000000004ULL
++#define AKF_KNOWN_BOOT_2	0x00b0000000000010ULL
++#define AKF_KNOWN_BOOT_3	0x0070000000000001ULL
++
++enum t7000_oldrtb_phase {
++	OLDRTB_PHASE_UNKNOWN,
++	OLDRTB_PHASE_IOP_STATE_12,
++	OLDRTB_PHASE_IOP_STATE_04,
++	OLDRTB_PHASE_AP_POWER_10,
++	OLDRTB_PHASE_IOP_ACK_01,
++	OLDRTB_PHASE_LOOPING,
++};
++
++struct t7000_oldrtb_state {
++	enum t7000_oldrtb_phase phase;
++	u64 last_msg;
++	u32 samples;
++	u32 unknown;
++	u32 loop_count;
++	u32 repeat_state12;
++	u32 seen_mask;
++	u16 iop_state;
++	u16 ap_power_state;
++	u16 iop_ack_state;
++	u32 last_a2i_ctl;
++	u32 last_i2a_ctl;
++};
++
++struct apple_t7000_ans {
++	struct device *dev;
++	void __iomem *regs;
++	resource_size_t size;
++	int pm_ret;
++	struct t7000_oldrtb_state oldrtb;
++};
++
++static u64 akf_read_recv(struct apple_t7000_ans *ans)
++{
++	u32 recv0 = readl(ans->regs + AKF_I2A_RECV0);
++	u32 recv1 = readl(ans->regs + AKF_I2A_RECV1);
++
++	return ((u64)recv1 << 32) | recv0;
++}
++
++static void akf_write_send(struct apple_t7000_ans *ans, u64 msg)
++{
++	writel((u32)msg, ans->regs + AKF_A2I_SEND0);
++	writel((u32)(msg >> 32), ans->regs + AKF_A2I_SEND1);
++}
++
++static const char *akf_known_msg_name(u64 msg)
++{
++	switch (msg) {
++	case AKF_KNOWN_BOOT_0:
++		return "observed-boot-0/repeated-state";
++	case AKF_KNOWN_BOOT_1:
++		return "observed-boot-1/state-change";
++	case AKF_KNOWN_BOOT_2:
++		return "observed-boot-2/ap-power";
++	case AKF_KNOWN_BOOT_3:
++		return "observed-boot-3/iop-power-ack";
++	default:
++		return "unknown";
++	}
++}
++
++static const char *akf_mgmt_type_name(u8 type)
++{
++	switch (type) {
++	case 0x60:
++		return "old-iop-state/version-candidate";
++	case 0x0b:
++		return "ap-power-state";
++	case 0x07:
++		return "iop-power-ack";
++	default:
++		return "unknown";
++	}
++}
++
++static const char *oldrtb_phase_name(enum t7000_oldrtb_phase phase)
++{
++	switch (phase) {
++	case OLDRTB_PHASE_IOP_STATE_12:
++		return "iop-state-0x12";
++	case OLDRTB_PHASE_IOP_STATE_04:
++		return "iop-state-0x04";
++	case OLDRTB_PHASE_AP_POWER_10:
++		return "ap-power-0x10";
++	case OLDRTB_PHASE_IOP_ACK_01:
++		return "iop-ack-0x01";
++	case OLDRTB_PHASE_LOOPING:
++		return "stable-management-loop";
++	case OLDRTB_PHASE_UNKNOWN:
++	default:
++		return "unknown";
++	}
++}
++
++static enum t7000_oldrtb_phase oldrtb_classify_msg(u64 msg)
++{
++	switch (msg) {
++	case AKF_KNOWN_BOOT_0:
++		return OLDRTB_PHASE_IOP_STATE_12;
++	case AKF_KNOWN_BOOT_1:
++		return OLDRTB_PHASE_IOP_STATE_04;
++	case AKF_KNOWN_BOOT_2:
++		return OLDRTB_PHASE_AP_POWER_10;
++	case AKF_KNOWN_BOOT_3:
++		return OLDRTB_PHASE_IOP_ACK_01;
++	default:
++		return OLDRTB_PHASE_UNKNOWN;
++	}
++}
++
++static void oldrtb_reset_state(struct t7000_oldrtb_state *st)
++{
++	memset(st, 0, sizeof(*st));
++	st->phase = OLDRTB_PHASE_UNKNOWN;
++}
++
++static void oldrtb_update_state(struct t7000_oldrtb_state *st, u64 msg,
++				u32 a2i_ctl, u32 i2a_ctl)
++{
++	enum t7000_oldrtb_phase next = oldrtb_classify_msg(msg);
++	u16 low16 = msg;
++
++	st->samples++;
++	st->last_msg = msg;
++	st->last_a2i_ctl = a2i_ctl;
++	st->last_i2a_ctl = i2a_ctl;
++
++	switch (next) {
++	case OLDRTB_PHASE_IOP_STATE_12:
++		st->seen_mask |= BIT(0);
++		st->iop_state = low16;
++		if (st->phase == OLDRTB_PHASE_IOP_ACK_01 ||
++		    st->phase == OLDRTB_PHASE_LOOPING)
++			st->loop_count++;
++		else if (st->phase == OLDRTB_PHASE_IOP_STATE_12)
++			st->repeat_state12++;
++		break;
++	case OLDRTB_PHASE_IOP_STATE_04:
++		st->seen_mask |= BIT(1);
++		st->iop_state = low16;
++		break;
++	case OLDRTB_PHASE_AP_POWER_10:
++		st->seen_mask |= BIT(2);
++		st->ap_power_state = low16;
++		break;
++	case OLDRTB_PHASE_IOP_ACK_01:
++		st->seen_mask |= BIT(3);
++		st->iop_ack_state = low16;
++		if ((st->seen_mask & 0xf) == 0xf)
++			next = OLDRTB_PHASE_LOOPING;
++		break;
++	case OLDRTB_PHASE_UNKNOWN:
++	default:
++		st->unknown++;
++		break;
++	}
++
++	st->phase = next;
++}
++
++static int oldrtb_collect_state(struct apple_t7000_ans *ans,
++				struct t7000_oldrtb_state *st, int samples)
++{
++	u32 a2i_ctl;
++	u32 i2a_ctl;
++	u64 msg;
++	int i;
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	oldrtb_reset_state(st);
++
++	for (i = 0; i < samples; i++) {
++		a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++		i2a_ctl = readl(ans->regs + AKF_I2A_CONTROL);
++		msg = akf_read_recv(ans);
++		oldrtb_update_state(st, msg, a2i_ctl, i2a_ctl);
++		usleep_range(1000, 2000);
++	}
++
++	ans->oldrtb = *st;
++
++	return 0;
++}
++
++static bool oldrtb_state_is_stable(const struct t7000_oldrtb_state *st)
++{
++	return st->samples && !st->unknown && (st->seen_mask & 0xf) == 0xf &&
++	       st->loop_count > 0;
++}
++
++static u64 oldrtb_phase_msg(enum t7000_oldrtb_phase phase)
++{
++	switch (phase) {
++	case OLDRTB_PHASE_IOP_STATE_12:
++		return AKF_KNOWN_BOOT_0;
++	case OLDRTB_PHASE_IOP_STATE_04:
++		return AKF_KNOWN_BOOT_1;
++	case OLDRTB_PHASE_AP_POWER_10:
++		return AKF_KNOWN_BOOT_2;
++	case OLDRTB_PHASE_IOP_ACK_01:
++		return AKF_KNOWN_BOOT_3;
++	default:
++		return 0;
++	}
++}
++
++static enum t7000_oldrtb_phase oldrtb_phase_from_token(const char *token)
++{
++	if (!strcmp(token, "state12") || !strcmp(token, "iop-state-0x12"))
++		return OLDRTB_PHASE_IOP_STATE_12;
++	if (!strcmp(token, "state04") || !strcmp(token, "iop-state-0x04"))
++		return OLDRTB_PHASE_IOP_STATE_04;
++	if (!strcmp(token, "ap_power10") || !strcmp(token, "ap-power-0x10"))
++		return OLDRTB_PHASE_AP_POWER_10;
++	if (!strcmp(token, "iop_ack01") || !strcmp(token, "iop-ack-0x01"))
++		return OLDRTB_PHASE_IOP_ACK_01;
++
++	return OLDRTB_PHASE_UNKNOWN;
++}
++
++static ssize_t akf_format_msg(char *buf, ssize_t len, int sample,
++			      u32 a2i_ctl, u32 i2a_ctl, u64 msg)
++{
++	u32 low = msg;
++	u32 high = msg >> 32;
++	u8 top = high >> 24;
++	u8 rtkit_type = high >> 20;
++	u8 mgmt_type = msg >> 52;
++	u8 mgmt_major = msg >> 60;
++	u8 mgmt_sub = (msg >> 48) & 0x0f;
++	u16 low16 = low;
++	u32 payload = low & 0x00ffffff;
++	u8 b7 = msg >> 56;
++	u8 b6 = msg >> 48;
++	u8 b5 = msg >> 40;
++	u8 b4 = msg >> 32;
++	u8 b3 = msg >> 24;
++	u8 b2 = msg >> 16;
++	u8 b1 = msg >> 8;
++	u8 b0 = msg;
++
++	return len + sysfs_emit_at(buf, len,
++				   "%02d a2i=%08x i2a=%08x empty=%u full=%u msg=%016llx bytes=%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x hi=%08x lo=%08x top=%02x rtkit_type=%02x mgmt_type=%02x major=%x sub=%x low16=%04x payload=%06x low8=%02x name=%s known=%s\n",
++				   sample, a2i_ctl, i2a_ctl,
++				   !!(i2a_ctl & AKF_CONTROL_EMPTY),
++				   !!(i2a_ctl & AKF_CONTROL_FULL),
++				   msg, b7, b6, b5, b4, b3, b2, b1, b0,
++				   high, low, top, rtkit_type, mgmt_type,
++				   mgmt_major, mgmt_sub, low16, payload, b0,
++				   akf_mgmt_type_name(mgmt_type),
++				   akf_known_msg_name(msg));
++}
++
++static ssize_t regs_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	u32 val;
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	for (i = 0; i < 16 && (i * 4) < ans->size; i++) {
++		val = readl(ans->regs + i * 4);
++		len += sysfs_emit_at(buf, len, "%03x: %08x\n", i * 4, val);
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(regs);
++
++static ssize_t mbox_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	static const struct {
++		const char *name;
++		u32 off;
++		bool is64;
++	} regs[] = {
++		{ "asc_a2i_control", 0x110, false },
++		{ "asc_i2a_control", 0x114, false },
++		{ "asc_a2i_send0", 0x800, true },
++		{ "asc_a2i_send1", 0x808, true },
++		{ "asc_i2a_recv0", 0x830, true },
++		{ "asc_i2a_recv1", 0x838, true },
++		{ "m3_irq_enable", 0x048, false },
++		{ "m3_irq_ack", 0x04c, false },
++		{ "m3_a2i_control", 0x050, false },
++		{ "m3_a2i_send0", 0x060, true },
++		{ "m3_a2i_send1", 0x068, true },
++		{ "m3_i2a_control", 0x080, false },
++		{ "m3_i2a_recv0", 0x0a0, true },
++		{ "m3_i2a_recv1", 0x0a8, true },
++	};
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		if (regs[i].off + (regs[i].is64 ? 8 : 4) > ans->size)
++			continue;
++
++		if (regs[i].is64)
++			len += sysfs_emit_at(buf, len, "%-16s @%03x: %016llx\n",
++					     regs[i].name, regs[i].off,
++					     readq(ans->regs + regs[i].off));
++		else
++			len += sysfs_emit_at(buf, len, "%-16s @%03x: %08x\n",
++					     regs[i].name, regs[i].off,
++					     readl(ans->regs + regs[i].off));
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(mbox);
++
++static ssize_t akf_mbox_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	static const struct {
++		const char *name;
++		u32 off;
++	} regs[] = {
++		{ "akf_set", AKF_BASE + 0x00 },
++		{ "akf_clr", AKF_BASE + 0x04 },
++		{ "akf_a2i_control", AKF_A2I_CONTROL },
++		{ "akf_a2i_send0", AKF_A2I_SEND0 },
++		{ "akf_a2i_send1", AKF_A2I_SEND1 },
++		{ "akf_a2i_recv0", AKF_BASE + 0x18 },
++		{ "akf_a2i_recv1", AKF_BASE + 0x1c },
++		{ "akf_i2a_control", AKF_I2A_CONTROL },
++		{ "akf_i2a_send0", AKF_BASE + 0x30 },
++		{ "akf_i2a_send1", AKF_BASE + 0x34 },
++		{ "akf_i2a_recv0", AKF_I2A_RECV0 },
++		{ "akf_i2a_recv1", AKF_I2A_RECV1 },
++	};
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		if (regs[i].off + 4 > ans->size)
++			continue;
++
++		len += sysfs_emit_at(buf, len, "%-16s @%03x: %08x\n",
++				     regs[i].name, regs[i].off,
++				     readl(ans->regs + regs[i].off));
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(akf_mbox);
++
++static ssize_t rxpoll_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	u32 a2i_ctl;
++	u32 i2a_ctl;
++	u64 recv0;
++	u64 recv1;
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	len += sysfs_emit_at(buf, len,
++			     "sample a2i_ctl i2a_ctl i2a_empty i2a_full recv0 recv1\n");
++
++	for (i = 0; i < 8; i++) {
++		a2i_ctl = readl(ans->regs + ASC_A2I_CONTROL);
++		i2a_ctl = readl(ans->regs + ASC_I2A_CONTROL);
++		recv0 = readq(ans->regs + ASC_I2A_RECV0);
++		recv1 = readq(ans->regs + ASC_I2A_RECV1);
++
++		len += sysfs_emit_at(buf, len,
++				     "%02d     %08x %08x %u         %u        %016llx %016llx\n",
++				     i, a2i_ctl, i2a_ctl,
++				     !!(i2a_ctl & ASC_CONTROL_EMPTY),
++				     !!(i2a_ctl & ASC_CONTROL_FULL), recv0, recv1);
++		usleep_range(1000, 2000);
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(rxpoll);
++
++static ssize_t akf_rxpoll_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	u32 a2i_ctl;
++	u32 i2a_ctl;
++	u32 recv0;
++	u32 recv1;
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	len += sysfs_emit_at(buf, len,
++			     "sample a2i_ctl i2a_ctl i2a_empty i2a_full recv0 recv1 combined ep type\n");
++
++	for (i = 0; i < 8; i++) {
++		a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++		i2a_ctl = readl(ans->regs + AKF_I2A_CONTROL);
++		recv0 = readl(ans->regs + AKF_I2A_RECV0);
++		recv1 = readl(ans->regs + AKF_I2A_RECV1);
++
++		len += sysfs_emit_at(buf, len,
++				     "%02d     %08x %08x %u         %u        %08x %08x %016llx %02x %02x\n",
++				     i, a2i_ctl, i2a_ctl,
++				     !!(i2a_ctl & AKF_CONTROL_EMPTY),
++				     !!(i2a_ctl & AKF_CONTROL_FULL),
++				     recv0, recv1,
++				     ((u64)recv1 << 32) | recv0,
++				     recv1 & 0xff, recv1 >> 20);
++		usleep_range(1000, 2000);
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(akf_rxpoll);
++
++static ssize_t akf_decode_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	u32 a2i_ctl;
++	u32 i2a_ctl;
++	u64 msg;
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	len += sysfs_emit_at(buf, len,
++			     "known sequence: %016llx -> %016llx -> %016llx -> %016llx\n",
++			     AKF_KNOWN_BOOT_0, AKF_KNOWN_BOOT_1,
++			     AKF_KNOWN_BOOT_2, AKF_KNOWN_BOOT_3);
++	len += sysfs_emit_at(buf, len,
++			     "fields: mgmt_type=msg[59:52], major=msg[63:60], sub=msg[51:48], low16=msg[15:0]\n");
++	len += sysfs_emit_at(buf, len,
++			     "note: local iOS 12.5.8 RTBuddyManagementEndpoint has old-format branches; this decoder only labels candidates and does not send replies\n");
++
++	for (i = 0; i < 16; i++) {
++		a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++		i2a_ctl = readl(ans->regs + AKF_I2A_CONTROL);
++		msg = akf_read_recv(ans);
++		len = akf_format_msg(buf, len, i, a2i_ctl, i2a_ctl, msg);
++		usleep_range(1000, 2000);
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(akf_decode);
++
++static ssize_t oldrtbuddy_plan_show(struct device *dev,
++				    struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	struct t7000_oldrtb_state st;
++	ssize_t len = 0;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	ret = oldrtb_collect_state(ans, &st, 64);
++	if (ret)
++		return ret;
++
++	len += sysfs_emit_at(buf, len, "oldrtbuddy_ordered_reply=v1\n");
++	len += sysfs_emit_at(buf, len,
++			     "stable=%u samples=%u unknown=%u phase=%s last_msg=%016llx loop_count=%u seen_mask=%x\n",
++			     oldrtb_state_is_stable(&st), st.samples, st.unknown,
++			     oldrtb_phase_name(st.phase), st.last_msg,
++			     st.loop_count, st.seen_mask);
++	len += sysfs_emit_at(buf, len,
++			     "usage=echo '<phase> <reply-hex64>' > oldrtbuddy_ordered_reply\n");
++	len += sysfs_emit_at(buf, len,
++			     "phases: state12 expects %016llx, state04 expects %016llx, ap_power10 expects %016llx, iop_ack01 expects %016llx\n",
++			     AKF_KNOWN_BOOT_0, AKF_KNOWN_BOOT_1,
++			     AKF_KNOWN_BOOT_2, AKF_KNOWN_BOOT_3);
++	len += sysfs_emit_at(buf, len,
++			     "guard=requires stable four-message management loop, matching current phase, exact expected message, and non-full AP-to-IOP mailbox\n");
++	len += sysfs_emit_at(buf, len,
++			     "next=use this only for ordered RTBuddy management experiments before ANSEndpoint1/ASPStorage work\n");
++
++	return len;
++}
++static DEVICE_ATTR_RO(oldrtbuddy_plan);
++
++static ssize_t oldrtbuddy_ordered_reply_store(struct device *dev,
++					      struct device_attribute *attr,
++					      const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	struct t7000_oldrtb_state st;
++	enum t7000_oldrtb_phase phase;
++	char phase_token[32];
++	u64 expected;
++	u64 reply;
++	u64 cur_msg;
++	u32 a2i_ctl;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%31s %llx", phase_token, &reply);
++	if (ret != 2)
++		return -EINVAL;
++
++	phase = oldrtb_phase_from_token(phase_token);
++	expected = oldrtb_phase_msg(phase);
++	if (!expected)
++		return -EINVAL;
++
++	ret = oldrtb_collect_state(ans, &st, 64);
++	if (ret)
++		return ret;
++
++	if (!oldrtb_state_is_stable(&st)) {
++		dev_notice(dev,
++			   "T7000 ANS AKF ordered reply skipped: unstable loop samples=%u unknown=%u seen_mask=%x loop_count=%u\n",
++			   st.samples, st.unknown, st.seen_mask, st.loop_count);
++		return -EAGAIN;
++	}
++
++	cur_msg = akf_read_recv(ans);
++	if (oldrtb_classify_msg(cur_msg) != phase || cur_msg != expected) {
++		dev_notice(dev,
++			   "T7000 ANS AKF ordered reply skipped: cur_msg=%016llx cur_phase=%s requested_phase=%s expected=%016llx\n",
++			   cur_msg, oldrtb_phase_name(oldrtb_classify_msg(cur_msg)),
++			   oldrtb_phase_name(phase), expected);
++		return -EAGAIN;
++	}
++
++	a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++	if (a2i_ctl & AKF_CONTROL_FULL)
++		return -EBUSY;
++
++	dev_notice(dev,
++		   "T7000 ANS AKF ordered reply: stable loop_count=%u phase=%s expected=%016llx reply=%016llx a2i_ctl=%08x\n",
++		   st.loop_count, oldrtb_phase_name(phase), expected, reply,
++		   a2i_ctl);
++	akf_write_send(ans, reply);
++
++	return count;
++}
++static DEVICE_ATTR_WO(oldrtbuddy_ordered_reply);
++
++static ssize_t oldrtbuddy_state_show(struct device *dev,
++				     struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	struct t7000_oldrtb_state st;
++	ssize_t len = 0;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	ret = oldrtb_collect_state(ans, &st, 64);
++	if (ret)
++		return ret;
++
++	len += sysfs_emit_at(buf, len, "oldrtbuddy_state=v1\n");
++	len += sysfs_emit_at(buf, len, "samples=%u unknown=%u phase=%s last_msg=%016llx\n",
++			     st.samples, st.unknown, oldrtb_phase_name(st.phase),
++			     st.last_msg);
++	len += sysfs_emit_at(buf, len,
++			     "seen: state12=%u state04=%u ap_power10=%u iop_ack01=%u mask=%x\n",
++			     !!(st.seen_mask & BIT(0)), !!(st.seen_mask & BIT(1)),
++			     !!(st.seen_mask & BIT(2)), !!(st.seen_mask & BIT(3)),
++			     st.seen_mask);
++	len += sysfs_emit_at(buf, len,
++			     "loop_count=%u repeat_state12=%u iop_state=%04x ap_power_state=%04x iop_ack_state=%04x\n",
++			     st.loop_count, st.repeat_state12, st.iop_state,
++			     st.ap_power_state, st.iop_ack_state);
++	len += sysfs_emit_at(buf, len,
++			     "last_controls: a2i=%08x i2a=%08x i2a_empty=%u i2a_full=%u\n",
++			     st.last_a2i_ctl, st.last_i2a_ctl,
++			     !!(st.last_i2a_ctl & AKF_CONTROL_EMPTY),
++			     !!(st.last_i2a_ctl & AKF_CONTROL_FULL));
++	len += sysfs_emit_at(buf, len,
++			     "interpretation=%s\n",
++			     oldrtb_state_is_stable(&st) ?
++			     "controller is alive but still cycling in old RTBuddy management; endpoint map/start not reached" :
++			     "unexpected traffic observed; inspect akf_decode before sending anything");
++	len += sysfs_emit_at(buf, len,
++			     "next_code_step=use oldrtbuddy_plan and oldrtbuddy_ordered_reply for gated management replies, then ANSEndpoint1 start before ASPStorage block commands\n");
++
++	return len;
++}
++static DEVICE_ATTR_RO(oldrtbuddy_state);
++
++static ssize_t send_raw_store(struct device *dev, struct device_attribute *attr,
++			      const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	u64 msg0;
++	u64 msg1;
++	u32 a2i_ctl;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%llx %llx", &msg0, &msg1);
++	if (ret != 2)
++		return -EINVAL;
++
++	a2i_ctl = readl(ans->regs + ASC_A2I_CONTROL);
++	if (a2i_ctl & ASC_CONTROL_FULL)
++		return -EBUSY;
++
++	dev_notice(dev, "T7000 ANS diag: raw send msg0=%016llx msg1=%016llx a2i_ctl=%08x\n",
++		   msg0, msg1, a2i_ctl);
++
++	writeq(msg0, ans->regs + ASC_A2I_SEND0);
++	writeq(msg1, ans->regs + ASC_A2I_SEND1);
++
++	return count;
++}
++static DEVICE_ATTR_WO(send_raw);
++
++static ssize_t akf_send_raw_store(struct device *dev, struct device_attribute *attr,
++				  const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	u32 msg0;
++	u32 msg1;
++	u32 a2i_ctl;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%x %x", &msg0, &msg1);
++	if (ret != 2)
++		return -EINVAL;
++
++	a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++	if (a2i_ctl & AKF_CONTROL_FULL)
++		return -EBUSY;
++
++	dev_notice(dev, "T7000 ANS AKF diag: raw send msg0=%08x msg1=%08x a2i_ctl=%08x\n",
++		   msg0, msg1, a2i_ctl);
++
++	writel(msg0, ans->regs + AKF_A2I_SEND0);
++	writel(msg1, ans->regs + AKF_A2I_SEND1);
++
++	return count;
++}
++static DEVICE_ATTR_WO(akf_send_raw);
++
++static ssize_t akf_send_if_current_store(struct device *dev, struct device_attribute *attr,
++					 const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	u64 expect;
++	u64 reply;
++	u64 cur_msg;
++	u32 a2i_ctl;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%llx %llx", &expect, &reply);
++	if (ret != 2)
++		return -EINVAL;
++
++	cur_msg = akf_read_recv(ans);
++	if (cur_msg != expect) {
++		dev_notice(dev,
++			   "T7000 ANS AKF diag: guarded send skipped cur_msg=%016llx expected=%016llx\n",
++			   cur_msg, expect);
++		return -EAGAIN;
++	}
++
++	a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++	if (a2i_ctl & AKF_CONTROL_FULL)
++		return -EBUSY;
++
++	dev_notice(dev,
++		   "T7000 ANS AKF diag: guarded send cur_msg=%016llx reply=%016llx a2i_ctl=%08x\n",
++		   cur_msg, reply, a2i_ctl);
++	akf_write_send(ans, reply);
++
++	return count;
++}
++static DEVICE_ATTR_WO(akf_send_if_current);
++
++static ssize_t rtkit_wake_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	u32 cpu_before;
++	u32 cpu_after;
++	u32 a2i_ctl;
++	u32 i2a_ctl;
++	u64 recv0;
++	u64 recv1;
++	u64 wake = RTKIT_MGMT_TYPE(RTKIT_MSG_IOP_PWR) | RTKIT_PWR_INIT;
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	cpu_before = readl(ans->regs + ASC_CPU_CONTROL);
++	writel(cpu_before | ASC_CPU_CONTROL_START, ans->regs + ASC_CPU_CONTROL);
++	cpu_after = readl(ans->regs + ASC_CPU_CONTROL);
++
++	a2i_ctl = readl(ans->regs + ASC_A2I_CONTROL);
++	len += sysfs_emit_at(buf, len,
++			     "cpu_before=%08x cpu_after=%08x a2i_ctl_before=%08x\n",
++			     cpu_before, cpu_after, a2i_ctl);
++
++	if (a2i_ctl & ASC_CONTROL_FULL)
++		return sysfs_emit_at(buf, len, "send=busy\n");
++
++	len += sysfs_emit_at(buf, len, "send msg0=%016llx msg1=%016x\n",
++			     wake, RTKIT_MGMT_EP);
++	writeq(wake, ans->regs + ASC_A2I_SEND0);
++	writeq(RTKIT_MGMT_EP, ans->regs + ASC_A2I_SEND1);
++
++	len += sysfs_emit_at(buf, len,
++			     "sample i2a_ctl empty full recv0 recv1 ep type hello\n");
++	for (i = 0; i < 32; i++) {
++		i2a_ctl = readl(ans->regs + ASC_I2A_CONTROL);
++		recv0 = readq(ans->regs + ASC_I2A_RECV0);
++		recv1 = readq(ans->regs + ASC_I2A_RECV1);
++
++		len += sysfs_emit_at(buf, len,
++				     "%02d     %08x %u     %u    %016llx %016llx %02llx %02llx %u\n",
++				     i, i2a_ctl,
++				     !!(i2a_ctl & ASC_CONTROL_EMPTY),
++				     !!(i2a_ctl & ASC_CONTROL_FULL),
++				     recv0, recv1, recv1 & 0xff, (recv0 >> 52) & 0xff,
++				     (u32)((recv1 & 0xff) == RTKIT_MGMT_EP &&
++					   ((recv0 >> 52) & 0xff) == RTKIT_MSG_HELLO));
++		if ((recv1 & 0xff) == RTKIT_MGMT_EP &&
++		    ((recv0 >> 52) & 0xff) == RTKIT_MSG_HELLO)
++			break;
++
++		usleep_range(5000, 7000);
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(rtkit_wake);
++
++static ssize_t akf_rtkit_wake_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	u32 a2i_ctl;
++	u32 i2a_ctl;
++	u32 recv0;
++	u32 recv1;
++	u64 recv;
++	u64 wake = RTKIT_MGMT_TYPE(RTKIT_MSG_IOP_PWR) | RTKIT_PWR_INIT;
++	int i;
++
++	if (!ans || !ans->regs)
++		return sysfs_emit(buf, "no-mmio\n");
++
++	a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++	len += sysfs_emit_at(buf, len, "akf_a2i_ctl_before=%08x\n", a2i_ctl);
++	if (a2i_ctl & AKF_CONTROL_FULL)
++		return sysfs_emit_at(buf, len, "send=busy\n");
++
++	len += sysfs_emit_at(buf, len, "send split msg0=%08x msg1=%08x combined=%016llx\n",
++			     (u32)wake, (u32)(wake >> 32), wake);
++	writel((u32)wake, ans->regs + AKF_A2I_SEND0);
++	writel((u32)(wake >> 32), ans->regs + AKF_A2I_SEND1);
++
++	len += sysfs_emit_at(buf, len,
++			     "sample i2a_ctl empty full recv0 recv1 combined ep type hello\n");
++	for (i = 0; i < 32; i++) {
++		i2a_ctl = readl(ans->regs + AKF_I2A_CONTROL);
++		recv0 = readl(ans->regs + AKF_I2A_RECV0);
++		recv1 = readl(ans->regs + AKF_I2A_RECV1);
++		recv = ((u64)recv1 << 32) | recv0;
++
++		len += sysfs_emit_at(buf, len,
++				     "%02d     %08x %u     %u    %08x %08x %016llx %02x %02llx %u\n",
++				     i, i2a_ctl,
++				     !!(i2a_ctl & AKF_CONTROL_EMPTY),
++				     !!(i2a_ctl & AKF_CONTROL_FULL),
++				     recv0, recv1, recv, recv1 & 0xff,
++				     (recv >> 52) & 0xff,
++				     (u32)((recv1 & 0xff) == RTKIT_MGMT_EP &&
++					   ((recv >> 52) & 0xff) == RTKIT_MSG_HELLO));
++		if ((recv1 & 0xff) == RTKIT_MGMT_EP &&
++		    ((recv >> 52) & 0xff) == RTKIT_MSG_HELLO)
++			break;
++
++		usleep_range(5000, 7000);
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(akf_rtkit_wake);
++
++static ssize_t state_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++
++	if (!ans)
++		return sysfs_emit(buf, "no-state\n");
++
++	return sysfs_emit(buf, "mmio_size=0x%llx pm_ret=%d runtime_status=%s\n",
++			  (unsigned long long)ans->size, ans->pm_ret,
++			  pm_runtime_status_suspended(dev) ? "suspended" : "active");
++}
++static DEVICE_ATTR_RO(state);
++
++static int apple_t7000_ans_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct apple_t7000_ans *ans;
++	struct resource *res;
++	resource_size_t size;
++	int irq;
++	int ret;
++	int i;
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	if (!res)
++		return dev_err_probe(dev, -ENODEV, "missing ANS MMIO resource\n");
++
++	ans = devm_kzalloc(dev, sizeof(*ans), GFP_KERNEL);
++	if (!ans)
++		return -ENOMEM;
++
++	ans->dev = dev;
++	ans->regs = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(ans->regs))
++		return dev_err_probe(dev, PTR_ERR(ans->regs), "failed to map ANS MMIO\n");
++
++	size = resource_size(res);
++	ans->size = size;
++	dev_set_drvdata(dev, ans);
++
++	dev_notice(dev, "T7000 ANS diag: mmio=%pa..%pa size=%pa\n",
++		   &res->start, &res->end, &size);
++
++	for (i = 0; i < 4; i++) {
++		irq = platform_get_irq_optional(pdev, i);
++		if (irq < 0)
++			dev_notice(dev, "T7000 ANS diag: irq%d unavailable (%d)\n", i, irq);
++		else
++			dev_notice(dev, "T7000 ANS diag: irq%d=%d\n", i, irq);
++	}
++
++	pm_runtime_enable(dev);
++	ret = pm_runtime_resume_and_get(dev);
++	ans->pm_ret = ret;
++	if (ret)
++		dev_warn(dev, "T7000 ANS diag: power-domain resume failed: %d\n", ret);
++	else
++		dev_notice(dev, "T7000 ANS diag: power-domain resume succeeded\n");
++
++	ret = device_create_file(dev, &dev_attr_regs);
++	if (ret)
++		return dev_err_probe(dev, ret, "failed to create regs sysfs file\n");
++
++	ret = device_create_file(dev, &dev_attr_state);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create state sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_mbox);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create mbox sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_akf_mbox);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create akf_mbox sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_rxpoll);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create rxpoll sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_akf_rxpoll);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create akf_rxpoll sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_akf_decode);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create akf_decode sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_state);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_state sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_plan);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_plan sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_ordered_reply sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_send_raw);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create send_raw sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_akf_send_raw);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create akf_send_raw sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_akf_send_if_current);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_akf_send_raw);
++		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create akf_send_if_current sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_rtkit_wake);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_akf_send_if_current);
++		device_remove_file(dev, &dev_attr_akf_send_raw);
++		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create rtkit_wake sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_akf_rtkit_wake);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_rtkit_wake);
++		device_remove_file(dev, &dev_attr_akf_send_if_current);
++		device_remove_file(dev, &dev_attr_akf_send_raw);
++		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create akf_rtkit_wake sysfs file\n");
++	}
++
++	dev_notice(dev, "T7000 ANS diag: bound; read 'rxpoll' before using guarded 'send_raw'\n");
++
++	return 0;
++}
++
++static void apple_t7000_ans_remove(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++
++	device_remove_file(dev, &dev_attr_akf_rtkit_wake);
++	device_remove_file(dev, &dev_attr_rtkit_wake);
++	device_remove_file(dev, &dev_attr_akf_send_if_current);
++	device_remove_file(dev, &dev_attr_akf_send_raw);
++	device_remove_file(dev, &dev_attr_send_raw);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++	device_remove_file(dev, &dev_attr_akf_decode);
++	device_remove_file(dev, &dev_attr_akf_rxpoll);
++	device_remove_file(dev, &dev_attr_rxpoll);
++	device_remove_file(dev, &dev_attr_akf_mbox);
++	device_remove_file(dev, &dev_attr_mbox);
++	device_remove_file(dev, &dev_attr_state);
++	device_remove_file(dev, &dev_attr_regs);
++	pm_runtime_put_sync(dev);
++	pm_runtime_disable(dev);
++}
++
++static const struct of_device_id apple_t7000_ans_of_match[] = {
++	{ .compatible = "apple,t7000-ans-iop-probe" },
++	{ .compatible = "apple,s5l8960x-ans-iop" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, apple_t7000_ans_of_match);
++
++static struct platform_driver apple_t7000_ans_driver = {
++	.probe = apple_t7000_ans_probe,
++	.remove = apple_t7000_ans_remove,
++	.driver = {
++		.name = "apple-t7000-ans-probe",
++		.of_match_table = apple_t7000_ans_of_match,
++	},
++};
++module_platform_driver(apple_t7000_ans_driver);
++
++MODULE_DESCRIPTION("Probe-only Apple T7000 ANS IOP bring-up helper");
++MODULE_LICENSE("GPL");

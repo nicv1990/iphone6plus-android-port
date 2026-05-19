@@ -1,0 +1,86 @@
+ 
+
+cat /sys/bus/platform/devices/208040000.ans/state
+cat /sys/bus/platform/devices/208040000.ans/akf_mbox
+cat /sys/bus/platform/devices/208040000.ans/akf_rxpoll
+sleep 1
+cat /sys/bus/platform/devices/208040000.ans/akf_rxpoll
+sleep 1
+cat /sys/bus/platform/devices/208040000.ans/akf_rxpoll
+cat /proc/partitions
+
+
+HoolockLinux test ramdisk shell
+
+Logs available in /HL_init.log
+
+~ # [6n
+~ # cat /sys/bus/platform/devices/208040000.ans/state
+mmio_size=0x2000 pm_ret=0 runtime_status=active
+~ # cat /sys/bus/platform/devices/208040000.ans/akf_mbox
+akf_set          @1000: 00001111
+akf_clr          @1004: 00001111
+akf_a2i_control  @1008: 0002cc01
+akf_a2i_send0    @1010: 00000001
+akf_a2i_send1    @1014: 00600000
+akf_a2i_recv0    @1018: 000ff013
+akf_a2i_recv1    @101c: 06000000
+akf_i2a_control  @1020: 00029901
+akf_i2a_send0    @1030: 00000000
+akf_i2a_send1    @1034: 00000000
+akf_i2a_recv0    @1038: 00000012
+akf_i2a_recv1    @103c: 06000000
+~ # cat /sys/bus/platform/devices/208040000.ans/akf_rxpoll
+sample a2i_ctl i2a_ctl i2a_empty i2a_full recv0 recv1 combined ep type
+00     0008dc01 0008a901 0         0        00000012 06000000 0600000000000012 00 60
+01     0008dc01 0008b901 0         0        00000012 06000000 0600000000000012 00 60
+02     0008dc01 0008c901 0         0        00000012 06000000 0600000000000012 00 60
+03     0008dc01 0008d901 0         0        00000012 06000000 0600000000000012 00 60
+04     0008dc01 0008e901 0         0        00000004 06000000 0600000000000004 00 60
+05     0008dc01 0008f901 0         0        00000010 00b00000 00b0000000000010 00 0b
+06     0008dc01 00080901 0         0        00000001 00700000 0070000000000001 00 07
+07     0008dc01 00091901 0         1        00000012 06000000 0600000000000012 00 60
+~ # sleep 1
+~ # cat /sys/bus/platform/devices/208040000.ans/akf_rxpoll
+sample a2i_ctl i2a_ctl i2a_empty i2a_full recv0 recv1 combined ep type
+00     0008dc01 00082901 0         0        00000012 06000000 0600000000000012 00 60
+01     0008dc01 00083901 0         0        00000012 06000000 0600000000000012 00 60
+02     0008dc01 00084901 0         0        00000012 06000000 0600000000000012 00 60
+03     0008dc01 00085901 0         0        00000012 06000000 0600000000000012 00 60
+04     0008dc01 00086901 0         0        00000004 06000000 0600000000000004 00 60
+05     0008dc01 00087901 0         0        00000010 00b00000 00b0000000000010 00 0b
+06     0008dc01 00088901 0         0        00000001 00700000 0070000000000001 00 07
+07     0008dc01 000a9901 1         0        00000012 06000000 0600000000000012 00 60
+~ # sleep 1
+~ # cat /sys/bus/platform/devices/208040000.ans/akf_rxpoll
+sample a2i_ctl i2a_ctl i2a_empty i2a_full recv0 recv1 combined ep type
+00     0008dc01 0008a901 0         0        00000012 06000000 0600000000000012 00 60
+01     0008dc01 0008b901 0         0        00000012 06000000 0600000000000012 00 60
+02     0008dc01 0008c901 0         0        00000012 06000000 0600000000000012 00 60
+03     0008dc01 0008d901 0         0        00000012 06000000 0600000000000012 00 60
+04     0008dc01 0008e901 0         0        00000004 06000000 0600000000000004 00 60
+05     0008dc01 0008f901 0         0        00000010 00b00000 00b0000000000010 00 0b
+06     0008dc01 00080901 0         0        00000001 00700000 0070000000000001 00 07
+07     0008dc01 00091901 0         1        00000012 06000000 0600000000000012 00 60
+~ # cat /proc/partitions
+major minor  #blocks  name
+
+   1        0       4096 ram0
+   1        1       4096 ram1
+   1        2       4096 ram2
+   1        3       4096 ram3
+   1        4       4096 ram4
+   1        5       4096 ram5
+   1        6       4096 ram6
+   1        7       4096 ram7
+   1        8       4096 ram8
+   1        9       4096 ram9
+   1       10       4096 ram10
+   1       11       4096 ram11
+   1       12       4096 ram12
+   1       13       4096 ram13
+   1       14       4096 ram14
+   1       15       4096 ram15
+  31        0         16 mtdblock0
+  31        1        128 mtdblock1
+~ # [6n
