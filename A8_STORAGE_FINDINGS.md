@@ -751,6 +751,79 @@ completed successfully
 The phone then reported normal iOS mode, so the updated image still needs a
 fresh DFU run before the canonical/type-6 candidate can be tested for real.
 
+## 2026-05-19 ordered phase-wait send test
+
+Booted the updated phase-wait image:
+
+```text
+/tmp/m1n1-linux-t7000-n56-ordered-reply-wait.bin
+```
+
+Ran the same canonical/type-6 byte-order candidate again:
+
+```text
+echo 'ap_power10 0060000000000010' > /sys/bus/platform/devices/208040000.ans/oldrtbuddy_ordered_reply
+```
+
+Capture saved at:
+
+```text
+artifacts/oldrtbuddy-ordered-reply-2026-05-19-182724.txt
+```
+
+This time the guarded write succeeded:
+
+```text
+SEND_ORDERED_REPLY ap_power10 0060000000000010
+SEND_STATUS 0
+```
+
+Before the send, the controller was in the known stable loop:
+
+```text
+oldrtbuddy_ordered_reply=v1
+stable=1 samples=64 unknown=0 phase=stable-management-loop
+last_msg=0070000000000001 loop_count=7 seen_mask=f
+```
+
+After the send, the controller was still in the same management loop:
+
+```text
+oldrtbuddy_ordered_reply=v1
+stable=1 samples=64 unknown=0 phase=ap-power-0x10
+last_msg=00b0000000000010 loop_count=8 seen_mask=f
+```
+
+Storage did not appear:
+
+```text
+/proc/partitions:
+ram0..ram15
+mtdblock0
+mtdblock1
+```
+
+Post-check capture:
+
+```text
+artifacts/oldrtbuddy-ordered-reply-postcheck-2026-05-19-182836.txt
+```
+
+`akf_decode` after the send still showed the same four-message cycle:
+
+```text
+0070000000000001
+0600000000000012
+0600000000000004
+00b0000000000010
+```
+
+Conclusion: the ordered phase-wait send path works, and the canonical/type-6
+reply candidate was accepted by the mailbox, but it did not advance ANS to
+`ANSEndpoint1` or expose internal NAND. The blocker is now more specific:
+Linux needs the real old RTBuddy management transaction format, likely more
+than one 64-bit acknowledgement value.
+
 ## 2026-05-18 device run with old RTBuddy state-machine scaffold
 
 Booted:
