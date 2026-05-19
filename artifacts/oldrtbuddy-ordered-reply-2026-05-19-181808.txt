@@ -1,0 +1,139 @@
+ 
+
+
+
+HoolockLinux test ramdisk shell
+
+Logs available in /HL_init.log
+
+~ # [6n
+~ # echo BEFORE_PLAN
+BEFORE_PLAN
+~ # cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_plan
+oldrtbuddy_ordered_reply=v1
+stable=1 samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001 loop_count=7 seen_mask=f
+usage=echo '<phase> <reply-hex64>' > oldrtbuddy_ordered_reply
+phases: state12 expects 0600000000000012, state04 expects 0600000000000004, ap_power10 expects 00b0000000000010, iop_ack01 expects 0070000000000001
+guard=requires stable four-message management loop, matching current phase, exact expected message, and non-full AP-to-IOP mailbox
+next=use this only for ordered RTBuddy management experiments before ANSEndpoint1/ASPStorage work
+~ # echo BEFORE_STATE
+BEFORE_STATE
+~ # cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_state
+oldrtbuddy_state=v1
+samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001
+seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f
+loop_count=7 repeat_state12=32 iop_state=0004 ap_power_state=0010 iop_ack_state=0001
+last_controls: a2i=0002cc01 i2a=00088901 i2a_empty=0 i2a_full=0
+interpretation=controller is alive but still cycling in old RTBuddy management; endpoint map/start not reached
+next_code_step=use oldrtbuddy_plan and oldrtbuddy_ordered_reply for gated management replies, then ANSEndpoint1 start before ASPStorage block commands
+~ # echo SEND_ORDERED_REPLY ap_power10 0060000000000010
+SEND_ORDERED_REPLY ap_power10 0060000000000010
+~ # echo 'ap_power10 0060000000000010' > /sys/bus/platform/devices/208040000.ans
+/oldrtbuddy_ordered_reply
+sh: write error: Resource temporarily unavailable
+~ # echo SEND_STATUS $?
+SEND_STATUS 1
+~ # echo AFTER_PLAN
+AFTER_PLAN
+~ # cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_plan
+oldrtbuddy_ordered_reply=v1
+stable=1 samples=64 unknown=0 phase=iop-state-0x12 last_msg=0600000000000012 loop_count=8 seen_mask=f
+usage=echo '<phase> <reply-hex64>' > oldrtbuddy_ordered_reply
+phases: state12 expects 0600000000000012, state04 expects 0600000000000004, ap_power10 expects 00b0000000000010, iop_ack01 expects 0070000000000001
+guard=requires stable four-message management loop, matching current phase, exact expected message, and non-full AP-to-IOP mailbox
+next=use this only for ordered RTBuddy management experiments before ANSEndpoint1/ASPStorage work
+~ # echo AFTER_STATE
+AFTER_STATE
+~ # cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_state
+oldrtbuddy_state=v1
+samples=64 unknown=0 phase=iop-state-0x12 last_msg=0600000000000012
+seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f
+loop_count=8 repeat_state12=31 iop_state=0012 ap_power_state=0010 iop_ack_state=0001
+last_controls: a2i=0002cc01 i2a=000a9901 i2a_empty=1 i2a_full=0
+interpretation=controller is alive but still cycling in old RTBuddy management; endpoint map/start not reached
+next_code_step=use oldrtbuddy_plan and oldrtbuddy_ordered_reply for gated management replies, then ANSEndpoint1 start before ASPStorage block commands
+~ # echo PARTITIONS
+PARTITIONS
+~ # cat /proc/partitions
+major minor  #blocks  name
+
+   1        0       4096 ram0
+   1        1       4096 ram1
+   1        2       4096 ram2
+   1        3       4096 ram3
+   1        4       4096 ram4
+   1        5       4096 ram5
+   1        6       4096 ram6
+   1        7       4096 ram7
+   1        8       4096 ram8
+   1        9       4096 ram9
+   1       10       4096 ram10
+   1       11       4096 ram11
+   1       12       4096 ram12
+   1       13       4096 ram13
+   1       14       4096 ram14
+   1       15       4096 ram15
+  31        0         16 mtdblock0
+  31        1        128 mtdblock1
+~ # dmesg | tail -n 60
+[   66.581453] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 00c02000 pad => 0x000009b4
+[   66.582394] dwc2 20c100000.usbdev: ep0 state:0
+[   66.583328] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x84c98200
+[   66.584267] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DXEPCTL=0x80c98200
+[   66.585206] dwc2 20c100000.usbdev: ep5in: req 00000000d29fe159: 2@0000000080e011f3, noi=0, zero=1, snok=0
+[   66.586165] dwc2 20c100000.usbdev: dwc2_hsotg_irq: 04048028 00040000 (d08c3cc4) retry 8
+[   66.587116] dwc2 20c100000.usbdev: dwc2_hsotg_irq: daint=00000020
+[   66.588063] dwc2 20c100000.usbdev: dwc2_hsotg_epint: ep5(in) DxEPINT=0x00000001
+[   66.589010] dwc2 20c100000.usbdev: dwc2_hsotg_epint: XferCompl: DxEPCTL=0x00c88200, DXEPTSIZ=14e7f681
+[   66.589958] dwc2 20c100000.usbdev: dwc2_hsotg_complete_in: adjusting size done 0 => 1
+[   66.590903] dwc2 20c100000.usbdev: req->length:1 req->actual:1 req->zero:1
+[   66.591843] dwc2 20c100000.usbdev: complete: ep 0000000043d06fa2 ep5in, req 000000003207dc8e, 0 => 000000004165cc55
+[   66.592792] dwc2 20c100000.usbdev: ep5in: req 000000004e70aff0: 63@000000004d810d7b, noi=0, zero=1, snok=0
+[   66.593747] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x00c88200, ep 5, dir in
+[   66.594696] dwc2 20c100000.usbdev: ureq->length:1 ureq->actual:0
+[   66.595644] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 1@1/1, 0x20080001 => 0x000009b0
+[   66.596595] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 00c02000 pad => 0x000009b4
+[   66.597546] dwc2 20c100000.usbdev: ep0 state:0
+[   66.598497] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x84c88200
+[   66.599451] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DXEPCTL=0x80c88200
+[   66.600401] dwc2 20c100000.usbdev: ep5in: req 000000003207dc8e: 2@00000000431454b4, noi=0, zero=1, snok=0
+[   66.601370] dwc2 20c100000.usbdev: ep5in: req 0000000072def3e5: 110@00000000a7958867, noi=0, zero=1, snok=0
+[   66.602332] dwc2 20c100000.usbdev: dwc2_hsotg_irq: 04048028 00040000 (d08c3cc4) retry 8
+[   66.603297] dwc2 20c100000.usbdev: dwc2_hsotg_irq: daint=00000020
+[   66.604252] dwc2 20c100000.usbdev: dwc2_hsotg_epint: ep5(in) DxEPINT=0x00000001
+[   66.605201] dwc2 20c100000.usbdev: dwc2_hsotg_epint: XferCompl: DxEPCTL=0x00c98200, DXEPTSIZ=14dff680
+[   66.606150] dwc2 20c100000.usbdev: dwc2_hsotg_complete_in: adjusting size done 0 => 1
+[   66.607095] dwc2 20c100000.usbdev: req->length:1 req->actual:1 req->zero:1
+[   66.608039] dwc2 20c100000.usbdev: complete: ep 0000000043d06fa2 ep5in, req 000000006bb4da99, 0 => 000000004165cc55
+[   66.608997] dwc2 20c100000.usbdev: ep5in: req 000000006d4c322e: 2@00000000c4a096b4, noi=0, zero=1, snok=0
+[   66.609962] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x00c98200, ep 5, dir in
+[   66.610925] dwc2 20c100000.usbdev: ureq->length:1 ureq->actual:0
+[   66.611888] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 1@1/1, 0x20080001 => 0x000009b0
+[   66.612858] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 00c02000 pad => 0x000009b4
+[   66.613824] dwc2 20c100000.usbdev: ep0 state:0
+[   66.614785] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x84c98200
+[   66.615751] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DXEPCTL=0x80c98200
+[   66.616712] dwc2 20c100000.usbdev: ep5in: req 000000006bb4da99: 150@000000002ed07837, noi=0, zero=1, snok=0
+[   66.617687] dwc2 20c100000.usbdev: dwc2_hsotg_irq: 04048028 00040000 (d08c3cc4) retry 8
+[   66.618655] dwc2 20c100000.usbdev: dwc2_hsotg_irq: daint=00000020
+[   66.619609] dwc2 20c100000.usbdev: dwc2_hsotg_epint: ep5(in) DxEPINT=0x00000001
+[   66.620561] dwc2 20c100000.usbdev: dwc2_hsotg_epint: XferCompl: DxEPCTL=0x00c88200, DXEPTSIZ=14d7f67f
+[   66.621516] dwc2 20c100000.usbdev: dwc2_hsotg_complete_in: adjusting size done 0 => 1
+[   66.622471] dwc2 20c100000.usbdev: req->length:1 req->actual:1 req->zero:1
+[   66.623426] dwc2 20c100000.usbdev: complete: ep 0000000043d06fa2 ep5in, req 0000000052eb3b64, 0 => 000000004165cc55
+[   66.624394] dwc2 20c100000.usbdev: ep5in: req 00000000fa40f6fb: 2@00000000d7bc58f2, noi=0, zero=1, snok=0
+[   66.625376] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x00c88200, ep 5, dir in
+[   66.626357] dwc2 20c100000.usbdev: ureq->length:93 ureq->actual:0
+[   66.627334] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 1@93/93, 0x2008005d => 0x000009b0
+[   66.628316] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: 00c02000 pad => 0x000009b4
+[   66.629294] dwc2 20c100000.usbdev: ep0 state:0
+[   66.630266] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DxEPCTL=0x84c88200
+[   66.631241] dwc2 20c100000.usbdev: dwc2_hsotg_start_req: DXEPCTL=0x80c88200
+[   66.632208] dwc2 20c100000.usbdev: ep5in: req 0000000052eb3b64: 4@000000002cb6085c, noi=0, zero=1, snok=0
+[   66.633200] dwc2 20c100000.usbdev: dwc2_hsotg_irq: 04048028 00040000 (d08c3cc4) retry 8
+[   66.634182] dwc2 20c100000.usbdev: dwc2_hsotg_irq: daint=00000020
+[   66.635156] dwc2 20c100000.usbdev: dwc2_hsotg_epint: ep5(in) DxEPINT=0x00000001
+[   66.636143] dwc2 20c100000.usbdev: dwc2_hsotg_epint: XferCompl: DxEPCTL=0x00c98200, DXEPTSIZ=14cff622
+[   66.637118] dwc2 20c100000.usbdev: dwc2_hsotg_complete_in: adjusting size done 0 => 93
+[   66.638089] dwc2 20c100000.usbdev: req->length:93 req->actual:93 req->zero:1
+~ # [6n

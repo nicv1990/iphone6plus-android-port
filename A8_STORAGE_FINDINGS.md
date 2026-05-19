@@ -691,6 +691,66 @@ reply was sent in this run. The next experiment should choose a specific
 management acknowledgement sequence and send it through `oldrtbuddy_ordered_reply`
 so the driver refuses to write unless the controller is at the matching phase.
 
+## 2026-05-19 first ordered-reply test and guard improvement
+
+Booted the ordered-reply image again and tested a canonical/type-6 byte-order
+candidate through the guarded sysfs path:
+
+```text
+echo 'ap_power10 0060000000000010' > /sys/bus/platform/devices/208040000.ans/oldrtbuddy_ordered_reply
+```
+
+Capture saved at:
+
+```text
+artifacts/oldrtbuddy-ordered-reply-2026-05-19-181808.txt
+```
+
+The write returned:
+
+```text
+sh: write error: Resource temporarily unavailable
+SEND_STATUS 1
+```
+
+This means the guard refused to send. The pre-send state was still good:
+
+```text
+oldrtbuddy_ordered_reply=v1
+stable=1 samples=64 unknown=0 phase=stable-management-loop
+last_msg=0070000000000001 loop_count=7 seen_mask=f
+```
+
+The likely reason is that `oldrtbuddy_ordered_reply` first sampled the stable
+loop and then checked only one instant of the rotating mailbox. By the time the
+write path checked the current value, the mailbox was no longer exactly at
+`ap_power10`, so it correctly returned `-EAGAIN` instead of sending.
+
+Updated `drivers/soc/apple/t7000-ans-probe.c` so
+`oldrtbuddy_ordered_reply` now:
+
+1. Confirms the full stable four-message loop.
+2. Waits briefly for the requested phase to appear.
+3. Sends only if the live message exactly matches the requested phase.
+4. Logs `wait_samples` when it sends.
+
+Built and packaged the updated image:
+
+```text
+artifacts/m1n1-linux-t7000-n56-ordered-reply-wait.bin
+/tmp/m1n1-linux-t7000-n56-ordered-reply-wait.bin
+```
+
+Kernel build result:
+
+```text
+make LLVM=1 ARCH=arm64 Image.gz dtbs
+completed successfully
+```
+
+The phone then reported normal iOS mode, so the updated image still needs a
+fresh DFU run before the canonical/type-6 candidate can be tested for real.
+
 ## 2026-05-18 device run with old RTBuddy state-machine scaffold
 
 Booted:

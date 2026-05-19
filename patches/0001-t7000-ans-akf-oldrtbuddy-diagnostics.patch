@@ -36,10 +36,10 @@ index 0b85ab61a..1e5974655 100644
 +apple-t7000-ans-probe-y = t7000-ans-probe.o
 diff --git a/drivers/soc/apple/t7000-ans-probe.c b/drivers/soc/apple/t7000-ans-probe.c
 new file mode 100644
-index 000000000..bc9d7ebd9
+index 000000000..62b9f0575
 --- /dev/null
 +++ b/drivers/soc/apple/t7000-ans-probe.c
-@@ -0,0 +1,1149 @@
+@@ -0,0 +1,1156 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Probe-only helper for the Apple T7000 ANS/ASP storage path.
@@ -601,6 +601,7 @@ index 000000000..bc9d7ebd9
 +	u64 reply;
 +	u64 cur_msg;
 +	u32 a2i_ctl;
++	int i;
 +	int ret;
 +
 +	if (!ans || !ans->regs)
@@ -626,10 +627,16 @@ index 000000000..bc9d7ebd9
 +		return -EAGAIN;
 +	}
 +
-+	cur_msg = akf_read_recv(ans);
-+	if (oldrtb_classify_msg(cur_msg) != phase || cur_msg != expected) {
++	for (i = 0; i < 256; i++) {
++		cur_msg = akf_read_recv(ans);
++		if (oldrtb_classify_msg(cur_msg) == phase && cur_msg == expected)
++			break;
++		usleep_range(500, 1000);
++	}
++
++	if (i == 256) {
 +		dev_notice(dev,
-+			   "T7000 ANS AKF ordered reply skipped: cur_msg=%016llx cur_phase=%s requested_phase=%s expected=%016llx\n",
++			   "T7000 ANS AKF ordered reply skipped: phase not observed cur_msg=%016llx cur_phase=%s requested_phase=%s expected=%016llx\n",
 +			   cur_msg, oldrtb_phase_name(oldrtb_classify_msg(cur_msg)),
 +			   oldrtb_phase_name(phase), expected);
 +		return -EAGAIN;
@@ -640,9 +647,9 @@ index 000000000..bc9d7ebd9
 +		return -EBUSY;
 +
 +	dev_notice(dev,
-+		   "T7000 ANS AKF ordered reply: stable loop_count=%u phase=%s expected=%016llx reply=%016llx a2i_ctl=%08x\n",
-+		   st.loop_count, oldrtb_phase_name(phase), expected, reply,
-+		   a2i_ctl);
++		   "T7000 ANS AKF ordered reply: stable loop_count=%u wait_samples=%d phase=%s expected=%016llx reply=%016llx a2i_ctl=%08x\n",
++		   st.loop_count, i, oldrtb_phase_name(phase), expected,
++		   reply, a2i_ctl);
 +	akf_write_send(ans, reply);
 +
 +	return count;
