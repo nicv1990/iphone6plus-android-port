@@ -824,6 +824,79 @@ reply candidate was accepted by the mailbox, but it did not advance ANS to
 Linux needs the real old RTBuddy management transaction format, likely more
 than one 64-bit acknowledgement value.
 
+## 2026-05-19 ordered reply matrix
+
+Booted the phase-wait ordered-reply image again and ran a small guarded matrix
+of plausible single-value responses. Capture saved at:
+
+```text
+artifacts/oldrtbuddy-reply-matrix-2026-05-19-184300.txt
+```
+
+Every write went through `oldrtbuddy_ordered_reply`, so each send was gated by:
+
+1. stable four-message loop observed first,
+2. requested phase seen live,
+3. exact current message matched for that phase,
+4. AP-to-IOP mailbox not full.
+
+Tested:
+
+```text
+ap_power10 0060000000000010  canonical/type6 ap-power candidate
+ap_power10 00b0000000000010  old-layout ap-power echo
+ap_power10 00b0000000000020  old-layout ap-power next-state candidate
+iop_ack01  0070000000000001  old-layout iop-ack echo
+iop_ack01  0060000000000001  canonical/type6 iop-ack candidate
+state12    0060000000000012  canonical/type6 state12 candidate
+state04    0060000000000004  canonical/type6 state04 candidate
+```
+
+All seven writes returned success:
+
+```text
+MATRIX_STATUS_1 0
+MATRIX_STATUS_2 0
+MATRIX_STATUS_3 0
+MATRIX_STATUS_4 0
+MATRIX_STATUS_5 0
+MATRIX_STATUS_6 0
+MATRIX_STATUS_7 0
+```
+
+None of them advanced ANS out of the same management loop. After each send,
+`oldrtbuddy_state` / `oldrtbuddy_plan` still reported:
+
+```text
+stable=1
+unknown=0
+seen_mask=f
+```
+
+`akf_decode` still showed the same repeating messages:
+
+```text
+0600000000000012
+0600000000000004
+00b0000000000010
+0070000000000001
+```
+
+Storage still did not appear:
+
+```text
+/proc/partitions:
+ram0..ram15
+mtdblock0
+mtdblock1
+```
+
+Conclusion: the mailbox send path is working and can safely target specific
+old RTBuddy phases, but the obvious single-word responses are insufficient.
+The remaining blocker is almost certainly the higher-level old RTBuddy
+transaction structure: message headers, payload buffers, sequence/status fields,
+or endpoint-map/start exchanges rather than one standalone 64-bit value.
+
 ## 2026-05-18 device run with old RTBuddy state-machine scaffold
 
 Booted:
