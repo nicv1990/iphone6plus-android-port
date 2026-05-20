@@ -1,277 +1,2841 @@
 %PDF-1.4
-%“Œ‹ž ReportLab Generated PDF document (opensource)
+%âãÏÓ
 1 0 obj
-<<
-/F1 2 0 R /F2 3 0 R /F3 4 0 R /F4 5 0 R
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 2 0 obj
-<<
-/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
 endobj
 3 0 obj
-<<
-/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
 endobj
 4 0 obj
-<<
-/BaseFont /Courier /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
->>
+<< /Length 3283 >>
+stream
+BT
+/F2 18 Tf
+1 0 0 1 54 732.00 Tm
+(iPhone 6 Plus Android Storage Bring-up Notes) Tj
+/F1 10 Tf
+1 0 0 1 54 701.00 Tm
+(Device tested: iPhone 6 Plus, iPhone7,1, N56AP, t7000, iOS 12.5.8.) Tj
+/F2 14 Tf
+1 0 0 1 54 675.00 Tm
+(What the phone proved) Tj
+/F1 10 Tf
+1 0 0 1 54 649.00 Tm
+(The iOS SSH ramdisk can see and read the internal NAND. It exposes:) Tj
+/F1 10 Tf
+1 0 0 1 54 631.00 Tm
+(  - ASPStorage matched on ANSEndpoint1) Tj
+/F1 10 Tf
+1 0 0 1 54 618.00 Tm
+(  - ASPBlockStorage) Tj
+/F1 10 Tf
+1 0 0 1 54 605.00 Tm
+(  - IONANDBlockDevice) Tj
+/F1 10 Tf
+1 0 0 1 54 592.00 Tm
+(  - Apple NAND Media as disk0) Tj
+/F1 10 Tf
+1 0 0 1 54 579.00 Tm
+(  - 128 GB Toshiba NAND) Tj
+/F1 10 Tf
+1 0 0 1 54 566.00 Tm
+(  - 4096-byte block size) Tj
+/F1 10 Tf
+1 0 0 1 54 553.00 Tm
+(  - GPT/APFS container at disk0s1) Tj
+/F1 10 Tf
+1 0 0 1 54 535.00 Tm
+(The first block of /dev/rdisk0 reads successfully and contains a GPT protective MBR) Tj
+/F1 10 Tf
+1 0 0 1 54 522.00 Tm
+(ending in 55 aa.) Tj
+/F2 14 Tf
+1 0 0 1 54 496.00 Tm
+(Why Linux does not see the iPhone storage yet) Tj
+/F1 10 Tf
+1 0 0 1 54 470.00 Tm
+(The Hoolock Linux boot only shows RAM disks \(/dev/ram0 through /dev/ram15\). That means) Tj
+/F1 10 Tf
+1 0 0 1 54 457.00 Tm
+(Linux is not reaching the internal NAND as a block device at all.) Tj
+/F1 10 Tf
+1 0 0 1 54 439.00 Tm
+(This is not an APFS format problem yet. APFS only matters after Linux has a real block) Tj
+/F1 10 Tf
+1 0 0 1 54 426.00 Tm
+(device like /dev/sda, /dev/mmcblk0, or an Apple NAND equivalent. Right now it has no) Tj
+/F1 10 Tf
+1 0 0 1 54 413.00 Tm
+(internal storage block device.) Tj
+/F1 10 Tf
+1 0 0 1 54 395.00 Tm
+(The iPhone 6 Plus storage path is:) Tj
+/F3 8 Tf
+1 0 0 1 54 373.00 Tm
+(ans@8040000) Tj
+/F3 8 Tf
+1 0 0 1 54 362.00 Tm
+(  iop-ans-nub) Tj
+/F3 8 Tf
+1 0 0 1 54 351.00 Tm
+(    RTBuddy) Tj
+/F3 8 Tf
+1 0 0 1 54 340.00 Tm
+(      ANSEndpoint1) Tj
+/F3 8 Tf
+1 0 0 1 54 329.00 Tm
+(        ASPStorage) Tj
+/F3 8 Tf
+1 0 0 1 54 318.00 Tm
+(          ASPBlockStorage) Tj
+/F3 8 Tf
+1 0 0 1 54 307.00 Tm
+(            IONANDBlockDevice) Tj
+/F3 8 Tf
+1 0 0 1 54 296.00 Tm
+(              Apple NAND Media -> disk0) Tj
+/F1 10 Tf
+1 0 0 1 54 276.00 Tm
+(Important device-tree facts from the live phone:) Tj
+/F1 10 Tf
+1 0 0 1 54 258.00 Tm
+(  - ans@8040000) Tj
+/F1 10 Tf
+1 0 0 1 54 245.00 Tm
+(  - compatible: iop,s5l8960x) Tj
+/F1 10 Tf
+1 0 0 1 54 232.00 Tm
+(  - role: ANS) Tj
+/F1 10 Tf
+1 0 0 1 54 219.00 Tm
+(  - interrupts: 0x25, 0x24, 0x27, 0x26) Tj
+/F1 10 Tf
+1 0 0 1 54 206.00 Tm
+(  - register region: address 0x208040000, length 0x2000) Tj
+/F1 10 Tf
+1 0 0 1 54 193.00 Tm
+(  - nub compatible: iop-nub,rtbuddy) Tj
+/F2 14 Tf
+1 0 0 1 54 167.00 Tm
+(What does not solve it) Tj
+/F1 10 Tf
+1 0 0 1 54 141.00 Tm
+(  - A generic Android GSI by itself does not make the storage appear.) Tj
+/F1 10 Tf
+1 0 0 1 54 128.00 Tm
+(  - The supplied recovery.img is a Qualcomm Android boot image, so its kernel is not) Tj
+/F1 10 Tf
+1 0 0 1 54 115.00 Tm
+(  bootable on Apple A8. Its ramdisk/userspace can be useful, but the kernel must still) Tj
+/F1 10 Tf
+1 0 0 1 54 102.00 Tm
+(  be the iPhone Linux kernel.) Tj
+/F1 10 Tf
+1 0 0 1 54 89.00 Tm
+(  - Enabling APFS support alone is not enough.) Tj
+/F1 10 Tf
+1 0 0 1 54 76.00 Tm
+(  - The existing CONFIG_NVME_APPLE=y path is for newer Apple ANS/NVMe controllers, not) Tj
+ET
+endstream
 endobj
 5 0 obj
-<<
-/BaseFont /ZapfDingbats /Name /F4 /Subtype /Type1 /Type /Font
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 4 0 R >>
 endobj
 6 0 obj
-<<
-/Contents 20 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3479 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(  this A8 ASP/IONAND path as currently wired.) Tj
+/F2 14 Tf
+1 0 0 1 54 712.00 Tm
+(Next real target) Tj
+/F1 10 Tf
+1 0 0 1 54 686.00 Tm
+(The next useful engineering target is an Apple A7/A8 IOP/RTBuddy/ASP storage driver or) Tj
+/F1 10 Tf
+1 0 0 1 54 673.00 Tm
+(bridge for Linux:) Tj
+/F1 10 Tf
+1 0 0 1 54 655.00 Tm
+(1. Describe ans@8040000 in the T7000 device tree.) Tj
+/F1 10 Tf
+1 0 0 1 54 642.00 Tm
+(2. Bring up the A7 IOP RTBuddy endpoint for ANSEndpoint1.) Tj
+/F1 10 Tf
+1 0 0 1 54 629.00 Tm
+(3. Implement enough ASPStorage/ASPBlockStorage commands to expose a read-only Linux) Tj
+/F1 10 Tf
+1 0 0 1 54 616.00 Tm
+(block device.) Tj
+/F1 10 Tf
+1 0 0 1 54 603.00 Tm
+(4. Only after a block device exists, deal with APFS or place Android on a separate) Tj
+/F1 10 Tf
+1 0 0 1 54 590.00 Tm
+(ext4-backed area.) Tj
+/F1 10 Tf
+1 0 0 1 54 572.00 Tm
+(Until step 3 exists, Android cannot boot from the internal iPhone storage.) Tj
+/F2 14 Tf
+1 0 0 1 54 546.00 Tm
+(2026-05-18 phone-side ANS probe test) Tj
+/F1 10 Tf
+1 0 0 1 54 520.00 Tm
+(Built and booted a custom Hoolock Linux payload with:) Tj
+/F1 10 Tf
+1 0 0 1 54 502.00 Tm
+(  - drivers/soc/apple/t7000-ans-probe.c) Tj
+/F1 10 Tf
+1 0 0 1 54 489.00 Tm
+(  - a T7000 DT node at /soc/ans@208040000) Tj
+/F1 10 Tf
+1 0 0 1 54 476.00 Tm
+(  - compatible strings apple,t7000-ans-iop-probe and apple,s5l8960x-ans-iop) Tj
+/F1 10 Tf
+1 0 0 1 54 458.00 Tm
+(The iPhone 6 Plus booted the payload through Pongo and exposed the Hoolock Linux USB) Tj
+/F1 10 Tf
+1 0 0 1 54 445.00 Tm
+(shell.) Tj
+/F1 10 Tf
+1 0 0 1 54 427.00 Tm
+(Confirmed from the phone:) Tj
+/F1 10 Tf
+1 0 0 1 54 409.00 Tm
+(  - /sys/firmware/fdt contains ans@208040000) Tj
+/F1 10 Tf
+1 0 0 1 54 396.00 Tm
+(  - /proc/device-tree/soc/ans@208040000 exists) Tj
+/F1 10 Tf
+1 0 0 1 54 383.00 Tm
+(  - /sys/bus/platform/devices/208040000.ans exists) Tj
+/F1 10 Tf
+1 0 0 1 54 370.00 Tm
+(  - /sys/bus/platform/drivers/apple-t7000-ans-probe exists) Tj
+/F1 10 Tf
+1 0 0 1 54 357.00 Tm
+(  - 208040000.ans is bound to apple-t7000-ans-probe) Tj
+/F1 10 Tf
+1 0 0 1 54 339.00 Tm
+(Storage still does not appear:) Tj
+/F3 8 Tf
+1 0 0 1 54 317.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 306.00 Tm
+(  ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 295.00 Tm
+(  mtdblock0  m1n1_stage2.log) Tj
+/F3 8 Tf
+1 0 0 1 54 284.00 Tm
+(  mtdblock1  adt) Tj
+/F1 10 Tf
+1 0 0 1 54 264.00 Tm
+(Conclusion: the DTB/boot path is now proven. Linux can receive and enumerate an ANS) Tj
+/F1 10 Tf
+1 0 0 1 54 251.00 Tm
+(node, but this probe does not implement the RTBuddy/ASP block protocol. The next) Tj
+/F1 10 Tf
+1 0 0 1 54 238.00 Tm
+(blocker is a real A8 ANS/ASP storage driver, not Android userspace or APFS.) Tj
+/F2 14 Tf
+1 0 0 1 54 212.00 Tm
+(2026-05-18 ANS MMIO diagnostic test) Tj
+/F1 10 Tf
+1 0 0 1 54 186.00 Tm
+(Built and booted a second diagnostic payload that maps /soc/ans@208040000,) Tj
+/F1 10 Tf
+1 0 0 1 54 173.00 Tm
+(keeps the runtime PM domain active, and exposes sysfs attributes on the phone.) Tj
+/F1 10 Tf
+1 0 0 1 54 155.00 Tm
+(Phone-side result:) Tj
+/F3 8 Tf
+1 0 0 1 54 133.00 Tm
+(/sys/bus/platform/devices/208040000.ans/uevent:) Tj
+/F3 8 Tf
+1 0 0 1 54 122.00 Tm
+(  DRIVER=apple-t7000-ans-probe) Tj
+/F3 8 Tf
+1 0 0 1 54 111.00 Tm
+(  OF_FULLNAME=/soc/ans@208040000) Tj
+/F3 8 Tf
+1 0 0 1 54 100.00 Tm
+(  OF_COMPATIBLE_0=apple,t7000-ans-iop-probe) Tj
+/F3 8 Tf
+1 0 0 1 54 89.00 Tm
+(  OF_COMPATIBLE_1=apple,s5l8960x-ans-iop) Tj
+/F3 8 Tf
+1 0 0 1 54 73.00 Tm
+(/sys/bus/platform/devices/208040000.ans/state:) Tj
+ET
+endstream
 endobj
 7 0 obj
-<<
-/Contents 21 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 6 0 R >>
 endobj
 8 0 obj
-<<
-/Contents 22 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3733 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(  mmio_size=0x2000 pm_ret=0 runtime_status=active) Tj
+/F3 8 Tf
+1 0 0 1 54 722.00 Tm
+(/sys/bus/platform/devices/208040000.ans/regs:) Tj
+/F3 8 Tf
+1 0 0 1 54 711.00 Tm
+(  000: 00000001) Tj
+/F3 8 Tf
+1 0 0 1 54 700.00 Tm
+(  004: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 689.00 Tm
+(  008: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 678.00 Tm
+(  00c: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 667.00 Tm
+(  010: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 656.00 Tm
+(  014: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 645.00 Tm
+(  018: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 634.00 Tm
+(  01c: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 623.00 Tm
+(  020: 00000001) Tj
+/F3 8 Tf
+1 0 0 1 54 612.00 Tm
+(  024: 00000403) Tj
+/F3 8 Tf
+1 0 0 1 54 601.00 Tm
+(  028: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 590.00 Tm
+(  02c: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 579.00 Tm
+(  030: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 568.00 Tm
+(  034: 00000030) Tj
+/F3 8 Tf
+1 0 0 1 54 557.00 Tm
+(  038: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 546.00 Tm
+(  03c: 00000000) Tj
+/F1 10 Tf
+1 0 0 1 54 526.00 Tm
+(Conclusion: Linux can power the A8 ANS block and safely read its MMIO window.) Tj
+/F1 10 Tf
+1 0 0 1 54 513.00 Tm
+(The next step is not another DTB or Android image test. It is implementing the) Tj
+/F1 10 Tf
+1 0 0 1 54 500.00 Tm
+(IOP mailbox/RTBuddy protocol for this controller, then using the ASPStorage) Tj
+/F1 10 Tf
+1 0 0 1 54 487.00 Tm
+(endpoint to register a Linux block device.) Tj
+/F2 14 Tf
+1 0 0 1 54 461.00 Tm
+(2026-05-18 ANS mailbox-layout diagnostic) Tj
+/F1 10 Tf
+1 0 0 1 54 435.00 Tm
+(Built and booted a third diagnostic payload that exposes likely ASC and M3) Tj
+/F1 10 Tf
+1 0 0 1 54 422.00 Tm
+(mailbox register offsets from the ANS MMIO window.) Tj
+/F1 10 Tf
+1 0 0 1 54 404.00 Tm
+(Phone-side result:) Tj
+/F3 8 Tf
+1 0 0 1 54 382.00 Tm
+(/sys/bus/platform/devices/208040000.ans/state:) Tj
+/F3 8 Tf
+1 0 0 1 54 371.00 Tm
+(  mmio_size=0x2000 pm_ret=0 runtime_status=active) Tj
+/F3 8 Tf
+1 0 0 1 54 355.00 Tm
+(/sys/bus/platform/devices/208040000.ans/mbox:) Tj
+/F3 8 Tf
+1 0 0 1 54 344.00 Tm
+(  asc_a2i_control  @110: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 333.00 Tm
+(  asc_i2a_control  @114: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 322.00 Tm
+(  asc_a2i_send0    @800: 0018001800000060) Tj
+/F3 8 Tf
+1 0 0 1 54 311.00 Tm
+(  asc_a2i_send1    @808: 6000000300000000) Tj
+/F3 8 Tf
+1 0 0 1 54 300.00 Tm
+(  asc_i2a_recv0    @830: 0000000000000000) Tj
+/F3 8 Tf
+1 0 0 1 54 289.00 Tm
+(  asc_i2a_recv1    @838: 0000000000000000) Tj
+/F3 8 Tf
+1 0 0 1 54 278.00 Tm
+(  m3_irq_enable    @048: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 267.00 Tm
+(  m3_irq_ack       @04c: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 256.00 Tm
+(  m3_a2i_control   @050: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 245.00 Tm
+(  m3_a2i_send0     @060: 0000000000000000) Tj
+/F3 8 Tf
+1 0 0 1 54 234.00 Tm
+(  m3_a2i_send1     @068: 0000000000000000) Tj
+/F3 8 Tf
+1 0 0 1 54 223.00 Tm
+(  m3_i2a_control   @080: 00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 212.00 Tm
+(  m3_i2a_recv0     @0a0: 0000000000000000) Tj
+/F3 8 Tf
+1 0 0 1 54 201.00 Tm
+(  m3_i2a_recv1     @0a8: 0000000000000000) Tj
+/F1 10 Tf
+1 0 0 1 54 181.00 Tm
+(Interpretation: the ASC-like mailbox window is present and has non-zero A2I) Tj
+/F1 10 Tf
+1 0 0 1 54 168.00 Tm
+(send registers, but its control register values do not line up cleanly with the) Tj
+/F1 10 Tf
+1 0 0 1 54 155.00 Tm
+(existing apple-mailbox driver's empty/full bit expectations. Do not blindly) Tj
+/F1 10 Tf
+1 0 0 1 54 142.00 Tm
+(bind the existing RTKit stack yet. Next safe step is an A8-specific mailbox shim) Tj
+/F1 10 Tf
+1 0 0 1 54 129.00 Tm
+(that logs control bits and can perform one controlled receive poll before any) Tj
+/F1 10 Tf
+1 0 0 1 54 116.00 Tm
+(attempt to send RTBuddy management messages.) Tj
+/F2 14 Tf
+1 0 0 1 54 90.00 Tm
+(2026-05-18 A8 AKF mailbox test) Tj
+ET
+endstream
 endobj
 9 0 obj
-<<
-/Contents 23 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 8 0 R >>
 endobj
 10 0 obj
-<<
-/Contents 24 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3671 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(The newer ASC/RTKit wake path did not produce a HELLO on A8:) Tj
+/F3 8 Tf
+1 0 0 1 54 716.00 Tm
+(cpu_before=00000000 cpu_after=00000000 a2i_ctl_before=00000000) Tj
+/F3 8 Tf
+1 0 0 1 54 705.00 Tm
+(send msg0=0060000000000220 msg1=0000000000000000) Tj
+/F3 8 Tf
+1 0 0 1 54 694.00 Tm
+(recv0/recv1 remained zero for 32 samples) Tj
+/F1 10 Tf
+1 0 0 1 54 674.00 Tm
+(Local hoolock-m1n1/src/akf.c shows that iop,s5l8960x devices use the older) Tj
+/F1 10 Tf
+1 0 0 1 54 661.00 Tm
+(AKF mailbox at base + 0x1000, with 32-bit message halves. A fourth diagnostic) Tj
+/F1 10 Tf
+1 0 0 1 54 648.00 Tm
+(payload exposed that AKF window and tested it on the phone.) Tj
+/F1 10 Tf
+1 0 0 1 54 630.00 Tm
+(Phone-side AKF state:) Tj
+/F3 8 Tf
+1 0 0 1 54 608.00 Tm
+(akf_set          @1000: 00001111) Tj
+/F3 8 Tf
+1 0 0 1 54 597.00 Tm
+(akf_clr          @1004: 00001111) Tj
+/F3 8 Tf
+1 0 0 1 54 586.00 Tm
+(akf_a2i_control  @1008: 00023301) Tj
+/F3 8 Tf
+1 0 0 1 54 575.00 Tm
+(akf_a2i_send0    @1010: 00000001) Tj
+/F3 8 Tf
+1 0 0 1 54 564.00 Tm
+(akf_a2i_send1    @1014: 00600000) Tj
+/F3 8 Tf
+1 0 0 1 54 553.00 Tm
+(akf_a2i_recv0    @1018: 000ff013) Tj
+/F3 8 Tf
+1 0 0 1 54 542.00 Tm
+(akf_a2i_recv1    @101c: 06000000) Tj
+/F3 8 Tf
+1 0 0 1 54 531.00 Tm
+(akf_i2a_control  @1020: 00020001) Tj
+/F3 8 Tf
+1 0 0 1 54 520.00 Tm
+(akf_i2a_recv0    @1038: 00000012) Tj
+/F3 8 Tf
+1 0 0 1 54 509.00 Tm
+(akf_i2a_recv1    @103c: 06000000) Tj
+/F1 10 Tf
+1 0 0 1 54 489.00 Tm
+(Polling the AKF receive side produced real ANS/RTBuddy management traffic:) Tj
+/F3 8 Tf
+1 0 0 1 54 467.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 456.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 445.00 Tm
+(00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 434.00 Tm
+(0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 414.00 Tm
+(Sending the old-format wake message through akf_send_raw:) Tj
+/F3 8 Tf
+1 0 0 1 54 392.00 Tm
+(echo 00000220 06000000 > /sys/bus/platform/devices/208040000.ans/akf_send_raw) Tj
+/F1 10 Tf
+1 0 0 1 54 372.00 Tm
+(was accepted by the mailbox and the same management sequence continued. Internal) Tj
+/F1 10 Tf
+1 0 0 1 54 359.00 Tm
+(storage still did not appear in /proc/partitions.) Tj
+/F1 10 Tf
+1 0 0 1 54 341.00 Tm
+(Conclusion: A8 ANS is not using the newer ASC/RTKit mailbox layout. Linux can) Tj
+/F1 10 Tf
+1 0 0 1 54 328.00 Tm
+(now communicate with the correct A8-era AKF mailbox, and the next implementation) Tj
+/F1 10 Tf
+1 0 0 1 54 315.00 Tm
+(step is decoding/responding to the old RTBuddy management sequence, then starting) Tj
+/F1 10 Tf
+1 0 0 1 54 302.00 Tm
+(ANSEndpoint1 and implementing ASP block commands.) Tj
+/F2 14 Tf
+1 0 0 1 54 276.00 Tm
+(2026-05-18 repeated AKF trace) Tj
+/F1 10 Tf
+1 0 0 1 54 250.00 Tm
+(Booted the AKF diagnostic payload again from DFU and captured a read-only trace) Tj
+/F1 10 Tf
+1 0 0 1 54 237.00 Tm
+(without sending another raw command. Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 215.00 Tm
+(artifacts/akf-trace-2026-05-18-1552.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 195.00 Tm
+(Initial AKF mailbox state:) Tj
+/F3 8 Tf
+1 0 0 1 54 173.00 Tm
+(akf_set          @1000: 00001111) Tj
+/F3 8 Tf
+1 0 0 1 54 162.00 Tm
+(akf_clr          @1004: 00001111) Tj
+/F3 8 Tf
+1 0 0 1 54 151.00 Tm
+(akf_a2i_control  @1008: 0002cc01) Tj
+/F3 8 Tf
+1 0 0 1 54 140.00 Tm
+(akf_a2i_send0    @1010: 00000001) Tj
+/F3 8 Tf
+1 0 0 1 54 129.00 Tm
+(akf_a2i_send1    @1014: 00600000) Tj
+/F3 8 Tf
+1 0 0 1 54 118.00 Tm
+(akf_a2i_recv0    @1018: 000ff013) Tj
+/F3 8 Tf
+1 0 0 1 54 107.00 Tm
+(akf_a2i_recv1    @101c: 06000000) Tj
+/F3 8 Tf
+1 0 0 1 54 96.00 Tm
+(akf_i2a_control  @1020: 00029901) Tj
+/F3 8 Tf
+1 0 0 1 54 85.00 Tm
+(akf_i2a_recv0    @1038: 00000012) Tj
+/F3 8 Tf
+1 0 0 1 54 74.00 Tm
+(akf_i2a_recv1    @103c: 06000000) Tj
+ET
+endstream
 endobj
 11 0 obj
-<<
-/Contents 25 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 10 0 R >>
 endobj
 12 0 obj
-<<
-/Contents 26 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3503 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(Three separate receive polls, including one-second waits between polls, repeated) Tj
+/F1 10 Tf
+1 0 0 1 54 725.00 Tm
+(the same management sequence:) Tj
+/F3 8 Tf
+1 0 0 1 54 703.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 692.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 681.00 Tm
+(00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 670.00 Tm
+(0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 650.00 Tm
+(The repeated result strengthens the interpretation that these are structured) Tj
+/F1 10 Tf
+1 0 0 1 54 637.00 Tm
+(A8 RTBuddy/AppleA7IOPV1 management messages waiting for a correct response, not) Tj
+/F1 10 Tf
+1 0 0 1 54 624.00 Tm
+(random register noise.) Tj
+/F2 14 Tf
+1 0 0 1 54 598.00 Tm
+(2026-05-18 decoder/guarded-reply payload) Tj
+/F1 10 Tf
+1 0 0 1 54 572.00 Tm
+(Added the next diagnostic step to drivers/soc/apple/t7000-ans-probe.c:) Tj
+/F1 10 Tf
+1 0 0 1 54 554.00 Tm
+(  - akf_decode: read-only decoded polling of the AKF receive mailbox.) Tj
+/F1 10 Tf
+1 0 0 1 54 541.00 Tm
+(  - akf_send_if_current: guarded send path that only writes a reply if the) Tj
+/F1 10 Tf
+1 0 0 1 54 528.00 Tm
+(  current receive message exactly matches the expected value supplied by the) Tj
+/F1 10 Tf
+1 0 0 1 54 515.00 Tm
+(  tester.) Tj
+/F1 10 Tf
+1 0 0 1 54 497.00 Tm
+(This gives us a safer way to test acknowledgements one at a time. Instead of) Tj
+/F1 10 Tf
+1 0 0 1 54 484.00 Tm
+(blindly sending a raw message, the test command must include both:) Tj
+/F3 8 Tf
+1 0 0 1 54 462.00 Tm
+(expected-current-message reply-message) Tj
+/F1 10 Tf
+1 0 0 1 54 442.00 Tm
+(If the phone has moved to a different mailbox state, the driver skips the send.) Tj
+/F1 10 Tf
+1 0 0 1 54 424.00 Tm
+(Built payload:) Tj
+/F3 8 Tf
+1 0 0 1 54 402.00 Tm
+(artifacts/m1n1-linux-t7000-n56-akf-decode.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 391.00 Tm
+(/tmp/m1n1-linux-t7000-n56-akf-decode.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 371.00 Tm
+(The first decoder payload had a sysfs length accounting bug and printed a) Tj
+/F1 10 Tf
+1 0 0 1 54 358.00 Tm
+(truncated line. Fixed payload:) Tj
+/F3 8 Tf
+1 0 0 1 54 336.00 Tm
+(artifacts/m1n1-linux-t7000-n56-akf-decode-fixed.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 325.00 Tm
+(/tmp/m1n1-linux-t7000-n56-akf-decode-fixed.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 305.00 Tm
+(Phone-side capture:) Tj
+/F3 8 Tf
+1 0 0 1 54 283.00 Tm
+(artifacts/akf-decode-fixed-2026-05-18-1930.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 263.00 Tm
+(Decoded result:) Tj
+/F3 8 Tf
+1 0 0 1 54 241.00 Tm
+(msg=0600000000000012 hi=06000000 lo=00000012 top=06 rtkit_type=60 low16=0012 payload=000012) Tj
+/F3 8 Tf
+1 0 0 1 54 230.00 Tm
+(msg=0600000000000004 hi=06000000 lo=00000004 top=06 rtkit_type=60 low16=0004 payload=000004) Tj
+/F3 8 Tf
+1 0 0 1 54 219.00 Tm
+(msg=00b0000000000010 hi=00b00000 lo=00000010 top=00 rtkit_type=0b low16=0010 payload=000010) Tj
+/F3 8 Tf
+1 0 0 1 54 208.00 Tm
+(msg=0070000000000001 hi=00700000 lo=00000001 top=00 rtkit_type=07 low16=0001 payload=000001) Tj
+/F1 10 Tf
+1 0 0 1 54 188.00 Tm
+(The sequence repeated twice in a 16-sample decode window. This gives us a clean) Tj
+/F1 10 Tf
+1 0 0 1 54 175.00 Tm
+(field split for the next guarded acknowledgement test.) Tj
+/F2 14 Tf
+1 0 0 1 54 149.00 Tm
+(2026-05-18 guarded AP-power echo test) Tj
+/F1 10 Tf
+1 0 0 1 54 123.00 Tm
+(Booted the fixed decoder payload again and tested exactly one guarded reply:) Tj
+/F3 8 Tf
+1 0 0 1 54 101.00 Tm
+(expected-current-message: 00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 90.00 Tm
+(reply-message:            00b0000000000010) Tj
+/F1 10 Tf
+1 0 0 1 54 70.00 Tm
+(Command pattern:) Tj
+ET
+endstream
 endobj
 13 0 obj
-<<
-/Contents 27 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 12 0 R >>
 endobj
 14 0 obj
-<<
-/Contents 28 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3146 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 729.00 Tm
+(echo 00b0000000000010 00b0000000000010 > \\) Tj
+/F3 8 Tf
+1 0 0 1 54 718.00 Tm
+(  /sys/bus/platform/devices/208040000.ans/akf_send_if_current) Tj
+/F1 10 Tf
+1 0 0 1 54 698.00 Tm
+(The command was retried until the mailbox current value matched. The guard) Tj
+/F1 10 Tf
+1 0 0 1 54 685.00 Tm
+(skipped the first six attempts with -EAGAIN, then sent once:) Tj
+/F3 8 Tf
+1 0 0 1 54 663.00 Tm
+(GUARDED_ECHO_SENT_7) Tj
+/F1 10 Tf
+1 0 0 1 54 643.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 621.00 Tm
+(artifacts/akf-guarded-echo-ap-power-2026-05-18-1936.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 601.00 Tm
+(Observed result after the echo:) Tj
+/F3 8 Tf
+1 0 0 1 54 579.00 Tm
+(a2i_ctl changed from 0002cc01 to 0000cd01) Tj
+/F3 8 Tf
+1 0 0 1 54 568.00 Tm
+(sequence still repeated:) Tj
+/F3 8 Tf
+1 0 0 1 54 557.00 Tm
+(  0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 546.00 Tm
+(  0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 535.00 Tm
+(  0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 524.00 Tm
+(  00b0000000000010) Tj
+/F1 10 Tf
+1 0 0 1 54 504.00 Tm
+(No internal storage block device appeared in /proc/partitions.) Tj
+/F1 10 Tf
+1 0 0 1 54 486.00 Tm
+(Conclusion: echoing the 0x0b/0x10 AP-power-looking message is accepted by the) Tj
+/F1 10 Tf
+1 0 0 1 54 473.00 Tm
+(AKF mailbox, but it is not the missing acknowledgement or next command needed) Tj
+/F1 10 Tf
+1 0 0 1 54 460.00 Tm
+(to advance ANS to ANSEndpoint1/ASPStorage.) Tj
+/F2 14 Tf
+1 0 0 1 54 434.00 Tm
+(2026-05-18 guarded AP-on-after-IOP-ack test) Tj
+/F1 10 Tf
+1 0 0 1 54 408.00 Tm
+(Booted the fixed decoder payload again and tested one guarded state transition) Tj
+/F1 10 Tf
+1 0 0 1 54 395.00 Tm
+(candidate:) Tj
+/F3 8 Tf
+1 0 0 1 54 373.00 Tm
+(expected-current-message: 0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 362.00 Tm
+(reply-message:            00b0000000000020) Tj
+/F1 10 Tf
+1 0 0 1 54 342.00 Tm
+(The send helper skipped until the current receive message exactly matched the) Tj
+/F1 10 Tf
+1 0 0 1 54 329.00 Tm
+(expected 0x07/0x01 value, then sent once:) Tj
+/F3 8 Tf
+1 0 0 1 54 307.00 Tm
+(GUARDED_AP_ON_SENT_8) Tj
+/F1 10 Tf
+1 0 0 1 54 287.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 265.00 Tm
+(artifacts/akf-guarded-ap-on-after-iop-ack-2026-05-18-1950.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 245.00 Tm
+(Observed mailbox state after the send:) Tj
+/F3 8 Tf
+1 0 0 1 54 223.00 Tm
+(akf_a2i_control @1008: 0000ce01) Tj
+/F3 8 Tf
+1 0 0 1 54 212.00 Tm
+(akf_a2i_send0   @1010: 00000020) Tj
+/F3 8 Tf
+1 0 0 1 54 201.00 Tm
+(akf_a2i_send1   @1014: 00b00000) Tj
+/F3 8 Tf
+1 0 0 1 54 190.00 Tm
+(akf_a2i_recv0   @1018: 00000020) Tj
+/F3 8 Tf
+1 0 0 1 54 179.00 Tm
+(akf_a2i_recv1   @101c: 00b00000) Tj
+/F1 10 Tf
+1 0 0 1 54 159.00 Tm
+(The controller accepted the message at the AKF mailbox level, but the receive) Tj
+/F1 10 Tf
+1 0 0 1 54 146.00 Tm
+(stream returned to the same repeating management sequence:) Tj
+/F3 8 Tf
+1 0 0 1 54 124.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 113.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 102.00 Tm
+(00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 91.00 Tm
+(0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 71.00 Tm
+(/proc/partitions still showed only RAM disks and the small MTD entries:) Tj
+ET
+endstream
 endobj
 15 0 obj
-<<
-/Contents 29 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 14 0 R >>
 endobj
 16 0 obj
-<<
-/Contents 30 0 R /MediaBox [ 0 0 612 792 ] /Parent 19 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3508 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 729.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 718.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 707.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 687.00 Tm
+(Conclusion: sending 00b0000000000020 after the 0070000000000001 message is) Tj
+/F1 10 Tf
+1 0 0 1 54 674.00 Tm
+(also not sufficient to advance ANS into ANSEndpoint1/ASPStorage. The) Tj
+/F1 10 Tf
+1 0 0 1 54 661.00 Tm
+(controlled send path is proven to work, but the missing piece is still the) Tj
+/F1 10 Tf
+1 0 0 1 54 648.00 Tm
+(correct old-A8 RTBuddy/AKF management response sequence, likely around the) Tj
+/F1 10 Tf
+1 0 0 1 54 635.00 Tm
+(0600000000000012 / 0600000000000004 messages.) Tj
+/F2 14 Tf
+1 0 0 1 54 609.00 Tm
+(2026-05-18 guarded 0x06 management ack tests) Tj
+/F1 10 Tf
+1 0 0 1 54 583.00 Tm
+(Tested the simplest old-A8 interpretation of the two 0x06 management) Tj
+/F1 10 Tf
+1 0 0 1 54 570.00 Tm
+(messages: treat them like IOP power/state messages and answer with matching) Tj
+/F1 10 Tf
+1 0 0 1 54 557.00 Tm
+(0x07 acknowledgements.) Tj
+/F1 10 Tf
+1 0 0 1 54 539.00 Tm
+(First test:) Tj
+/F3 8 Tf
+1 0 0 1 54 517.00 Tm
+(expected-current-message: 0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 506.00 Tm
+(reply-message:            0070000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 495.00 Tm
+(result:                   GUARDED_06_12_ACK_SENT_1) Tj
+/F3 8 Tf
+1 0 0 1 54 484.00 Tm
+(capture:                  artifacts/akf-guarded-ack-06-12-2026-05-18-1957.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 464.00 Tm
+(Second test:) Tj
+/F3 8 Tf
+1 0 0 1 54 442.00 Tm
+(expected-current-message: 0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 431.00 Tm
+(reply-message:            0070000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 420.00 Tm
+(result:                   GUARDED_06_04_ACK_SENT_4) Tj
+/F3 8 Tf
+1 0 0 1 54 409.00 Tm
+(capture:                  artifacts/akf-guarded-ack-06-04-2026-05-18-1959.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 389.00 Tm
+(Both messages were accepted by the AKF mailbox send path. After each send, the) Tj
+/F1 10 Tf
+1 0 0 1 54 376.00 Tm
+(controller returned to the same repeating management sequence:) Tj
+/F3 8 Tf
+1 0 0 1 54 354.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 343.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 332.00 Tm
+(00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 321.00 Tm
+(0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 301.00 Tm
+(/proc/partitions still did not show the internal NAND; only RAM disks and the) Tj
+/F1 10 Tf
+1 0 0 1 54 288.00 Tm
+(two tiny MTD blocks were present.) Tj
+/F1 10 Tf
+1 0 0 1 54 270.00 Tm
+(Conclusion: the missing handshake is not a simple 0x06 -> 0x07 same-payload) Tj
+/F1 10 Tf
+1 0 0 1 54 257.00 Tm
+(acknowledgement for either observed 0x06 message. The next step should be to) Tj
+/F1 10 Tf
+1 0 0 1 54 244.00 Tm
+(derive the old A8 RTBuddy management sequence from iOS/m1n1 behavior instead) Tj
+/F1 10 Tf
+1 0 0 1 54 231.00 Tm
+(of trying more one-off guessed acknowledgements.) Tj
+/F2 14 Tf
+1 0 0 1 54 205.00 Tm
+(2026-05-18 local iOS 12.5.8 driver study) Tj
+/F1 10 Tf
+1 0 0 1 54 179.00 Tm
+(Used the local iPhone 6 Plus iOS 12.5.8 restore files already on disk:) Tj
+/F3 8 Tf
+1 0 0 1 54 157.00 Tm
+(/Users/nicvotolato/Desktop/iPhone_5.5_12.5.8_16H88_Restore/kernelcache.release.iphone7) Tj
+/F1 10 Tf
+1 0 0 1 54 137.00 Tm
+(Decompressed local driver image:) Tj
+/F3 8 Tf
+1 0 0 1 54 115.00 Tm
+(analysis/ios1258-driver-study/kernelcache.dec/kernelcache.release.iphone7.decompressed) Tj
+/F1 10 Tf
+1 0 0 1 54 95.00 Tm
+(Confirmed storage-related modules in the image:) Tj
+/F3 8 Tf
+1 0 0 1 54 73.00 Tm
+(com.apple.driver.AppleNANDConfigAccess) Tj
+ET
+endstream
 endobj
 17 0 obj
-<<
-/PageMode /UseNone /Pages 19 0 R /Type /Catalog
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 16 0 R >>
 endobj
 18 0 obj
-<<
-/Author (Codex) /CreationDate (D:20260518224754-04'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260518224754-04'00') /Producer (ReportLab PDF Library - \(opensource\)) 
-  /Subject (\(unspecified\)) /Title (A8 STORAGE FINDINGS) /Trapped /False
->>
+<< /Length 3706 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(com.apple.driver.AppleA7IOP) Tj
+/F3 8 Tf
+1 0 0 1 54 727.00 Tm
+(com.apple.driver.RTBuddy) Tj
+/F3 8 Tf
+1 0 0 1 54 716.00 Tm
+(com.apple.driver.ASPSupportNodes) Tj
+/F3 8 Tf
+1 0 0 1 54 705.00 Tm
+(com.apple.driver.AppleEffaceableStorage) Tj
+/F3 8 Tf
+1 0 0 1 54 694.00 Tm
+(com.apple.driver.AppleEffaceableBlockDevice) Tj
+/F1 10 Tf
+1 0 0 1 54 674.00 Tm
+(Important classes discovered:) Tj
+/F3 8 Tf
+1 0 0 1 54 652.00 Tm
+(AppleA7IOPV1) Tj
+/F3 8 Tf
+1 0 0 1 54 641.00 Tm
+(AppleA7IOPNub) Tj
+/F3 8 Tf
+1 0 0 1 54 630.00 Tm
+(RTBuddyManagementEndpoint) Tj
+/F3 8 Tf
+1 0 0 1 54 619.00 Tm
+(RTBuddyEndpoint) Tj
+/F3 8 Tf
+1 0 0 1 54 608.00 Tm
+(RTBuddyEndpointService) Tj
+/F3 8 Tf
+1 0 0 1 54 597.00 Tm
+(RTBuddyService) Tj
+/F3 8 Tf
+1 0 0 1 54 586.00 Tm
+(RTBuddyMailboxDecoder) Tj
+/F3 8 Tf
+1 0 0 1 54 575.00 Tm
+(RTBuddyRtkitDecoder) Tj
+/F3 8 Tf
+1 0 0 1 54 564.00 Tm
+(ASPStorage) Tj
+/F3 8 Tf
+1 0 0 1 54 553.00 Tm
+(ASPRequest) Tj
+/F3 8 Tf
+1 0 0 1 54 542.00 Tm
+(ASPFirmware) Tj
+/F3 8 Tf
+1 0 0 1 54 531.00 Tm
+(ASPLLBFirmware) Tj
+/F3 8 Tf
+1 0 0 1 54 520.00 Tm
+(ASPPanicLog) Tj
+/F3 8 Tf
+1 0 0 1 54 509.00 Tm
+(ASPEffaceable) Tj
+/F3 8 Tf
+1 0 0 1 54 498.00 Tm
+(ASPDiagnostic) Tj
+/F3 8 Tf
+1 0 0 1 54 487.00 Tm
+(AppleNANDConfigAccess) Tj
+/F1 10 Tf
+1 0 0 1 54 467.00 Tm
+(The iOS personality data confirms the stack shape:) Tj
+/F3 8 Tf
+1 0 0 1 54 445.00 Tm
+(AppleA7IOPV1 matches IONameMatch "iop,s5l8960x") Tj
+/F3 8 Tf
+1 0 0 1 54 434.00 Tm
+(ASPStorage matches provider RTBuddyEndpointService) Tj
+/F3 8 Tf
+1 0 0 1 54 423.00 Tm
+(ASPStorage uses IONameMatch "ANSEndpoint1") Tj
+/F3 8 Tf
+1 0 0 1 54 412.00 Tm
+(ASPBlockStorage, ASPFirmware, ASPEffaceable, ASPNVRAM, and others attach below ASPStorage) Tj
+/F1 10 Tf
+1 0 0 1 54 392.00 Tm
+(Interesting local source-reference strings:) Tj
+/F3 8 Tf
+1 0 0 1 54 370.00 Tm
+(RTBuddyManagementEndpoint.cpp:) Tj
+/F3 8 Tf
+1 0 0 1 54 359.00 Tm
+(  unsupported message received on management endpoint) Tj
+/F3 8 Tf
+1 0 0 1 54 348.00 Tm
+(  invalid management message ... status = ...) Tj
+/F3 8 Tf
+1 0 0 1 54 337.00 Tm
+(  Invalid pinger sequence number received) Tj
+/F3 8 Tf
+1 0 0 1 54 326.00 Tm
+(  unsupported power state) Tj
+/F3 8 Tf
+1 0 0 1 54 310.00 Tm
+(RTBuddy.cpp:) Tj
+/F3 8 Tf
+1 0 0 1 54 299.00 Tm
+(  Incompatible protocol version) Tj
+/F3 8 Tf
+1 0 0 1 54 288.00 Tm
+(  Failed to validate IOP: status=..., version=...) Tj
+/F3 8 Tf
+1 0 0 1 54 277.00 Tm
+(  No response received ... not started?) Tj
+/F3 8 Tf
+1 0 0 1 54 261.00 Tm
+(ASPStorage.cpp:) Tj
+/F3 8 Tf
+1 0 0 1 54 250.00 Tm
+(  ASP_PROTOCOL_VERSION mismatch) Tj
+/F3 8 Tf
+1 0 0 1 54 239.00 Tm
+(  ASPStorage::ExecuteCommand - sendMessage\(\) failed) Tj
+/F3 8 Tf
+1 0 0 1 54 228.00 Tm
+(  Invalid unsolicited signal value) Tj
+/F3 8 Tf
+1 0 0 1 54 217.00 Tm
+(  Invalid message type received) Tj
+/F3 8 Tf
+1 0 0 1 54 206.00 Tm
+(  RTBuddy returned ... from setPowerState) Tj
+/F1 10 Tf
+1 0 0 1 54 186.00 Tm
+(Disassembly around RTBuddyManagementEndpoint shows protocol-format branching) Tj
+/F1 10 Tf
+1 0 0 1 54 173.00 Tm
+(around a 0x40 selector and message-size choices such as 0x44/0x54 versus) Tj
+/F1 10 Tf
+1 0 0 1 54 160.00 Tm
+(0x110/0x120. This supports the current conclusion that the observed A8) Tj
+/F1 10 Tf
+1 0 0 1 54 147.00 Tm
+(management traffic is not handled by the simple modern compact RTKit sequence) Tj
+/F1 10 Tf
+1 0 0 1 54 134.00 Tm
+(we were testing. The next implementation step should model the old) Tj
+/F1 10 Tf
+1 0 0 1 54 121.00 Tm
+(RTBuddyManagementEndpoint layout enough to parse message headers, status,) Tj
+/F1 10 Tf
+1 0 0 1 54 108.00 Tm
+(version, pinger, and power-state fields before attempting further replies.) Tj
+/F2 14 Tf
+1 0 0 1 54 82.00 Tm
+(2026-05-18 device run with expanded old-management decoder) Tj
+ET
+endstream
 endobj
 19 0 obj
-<<
-/Count 11 /Kids [ 6 0 R 7 0 R 8 0 R 9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R 15 0 R 
-  16 0 R ] /Type /Pages
->>
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 18 0 R >>
 endobj
 20 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1589
->>
+<< /Length 3406 >>
 stream
-Gb!#[9lJcG&A@7.b[gg!@4S'GI5m#$g1\q>BMpc)Ya8[0M70dR6s$25Uq_A6Pl.4WY#=GeNWIfF.IkZ01W)]a2L^Im7QJ70KZe-4`.;k.KN]),cgW*jpjPNoRBD<(IH"?=5(NAZiXj]\JOM]U%k(QVhnXkbH%@Ung\8;kk4ig!*:n'gf5GgaIu%TC%)$bOLk:6adqgUE>f<I0A!e]BZ6b8tR23u^H3JLZEVU*]Ij+_'#.s%1j&c/k_!1Zi%F,.pC)K"LeK@Q$[_B(%'5YSs^%_FZNB#j2MT8fFJCb$Yi:;3(IB^`[pIRNTHY9O!qOQr3VluSiI+u*aVP[^4W0HCIJ[JqI#S#;@b%5qpkC[?,-m8W6juW;'5VBX1MboTEJS(qV:VmgEKYts:Yq!^;O#tp9k[s2k\ZK'%a&_HQ$ZR=1j)"Dq8s[MsI"7"f+?9[-`)(Ii)`29&GZh6Zm`'J>/\"ZnT2n:!H.@Jj*`gqY[.j7Q_)CO:WGFRI*SCp)6fK>U#8-_GIbK%\QYe&'^V.Ih6fQRC,`P421)sJKa])GTW_!SrRAo6"Zn@R@,VbL/O>@Ut49eY>192<6hp">!nOapRjO[)9_7;8-7FIc'43I7AXm"5-9em;Dm*g)>AFF>$p.c.ok)6AK'6VjQ3eF5A'/Y,)7BBN-2pD>?H(;1+\mVh?*d!1B3s]lPL*5[0=[?A+"`XV=3.XoI,b6a/<(GSRdj\T"oWY;Xncn\u`F5nW!bD/6UE8XPoK=,*Xr^,,4a`cSQfI?'$mJOsQ57+9grGK:^[0S[W:*_O%S'du<4A^5qF+R[<@]:0/OnqZk)YkjY"0LTaLD6WEZISRb/HEbSrH=?6^GLfC!`/7nOTL;*,[.u^l'%h,oVT*j]iT=4'\`%CXHEj^=@!^_rnC/5=$j1KL.(sI#Qs^bc%VfnM=7]`\\+XKd!5C.J$+:UIk]&/eEmgOC+E3*tn"^\"H0Pn?$n.1mYUBVNOiYQcW+(=\dbia1f6n+Oik;k6uL85c*4&5u0:jaUfb%f`QT"4$TdP/?V*!^5?K)LT\O'>Q*5/HrY?f&eQ#kdD),J>_j$+REiiu`cJ8U<=KdWE<n9DdKP*M+XRCR7[>pjBBd=BM]Is/j-C[&4(al5Gok5:[dr^9-k5n+f#kb2dmo_o!g2B<b=#cd59Nr1BH_Q+Dt;DNhTAfkmp_iL2k;!.LWU'd'iPF]d;_-bL:64.V>lpK]M],5Jl>^U,>^L@j2$+j&:s&OVac8@qKH=GHZP.pd0$1R28G>?Z(CF?"h5'jlSs?2g]M5rlLb\u2GX>M6Y<RIo^9s(39h+qZN+;M.iA0fLSj;^Og\U/q>2)ej==(W<iA(2#HG]X\6tG^YUDqXaue(sg`/jH'IA<3!VtV3o.?+=*.:I<*=:=ZRrH&X\A.E:,*?BKVV!/t=r[nc;.$n;0_4S.%Q<P(YX)&tUD3)X@!h)Ch`71qS^YJ8>=uG4.G71BrT(J:^ah9Dhd!i)?L5#W`I:0Xn7=)W;p[`sE<RnR9=2P&,h`(^UN%jQ")d9pPoP(PX5f^EIgo/N'";B7loBC@m[%\&^JVI=if>Q7?SC?s5CPk;CB~>endstream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(Added an expanded read-only decoder to t7000-ans-probe.c and packaged:) Tj
+/F3 8 Tf
+1 0 0 1 54 716.00 Tm
+(artifacts/m1n1-linux-t7000-n56-akf-oldmgmt-decode.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 705.00 Tm
+(/tmp/m1n1-linux-t7000-n56-akf-oldmgmt-decode.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 685.00 Tm
+(The phone booted the diagnostic image and exposed the Hoolock Linux console.) Tj
+/F1 10 Tf
+1 0 0 1 54 672.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 650.00 Tm
+(artifacts/akf-oldmgmt-decode-2026-05-18-2024.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 630.00 Tm
+(Read-only state:) Tj
+/F3 8 Tf
+1 0 0 1 54 608.00 Tm
+(mmio_size=0x2000 pm_ret=0 runtime_status=active) Tj
+/F1 10 Tf
+1 0 0 1 54 588.00 Tm
+(Mailbox state:) Tj
+/F3 8 Tf
+1 0 0 1 54 566.00 Tm
+(akf_a2i_control  @1008: 0002cc01) Tj
+/F3 8 Tf
+1 0 0 1 54 555.00 Tm
+(akf_a2i_send0    @1010: 00000001) Tj
+/F3 8 Tf
+1 0 0 1 54 544.00 Tm
+(akf_a2i_send1    @1014: 00600000) Tj
+/F3 8 Tf
+1 0 0 1 54 533.00 Tm
+(akf_a2i_recv0    @1018: 000ff013) Tj
+/F3 8 Tf
+1 0 0 1 54 522.00 Tm
+(akf_a2i_recv1    @101c: 06000000) Tj
+/F3 8 Tf
+1 0 0 1 54 511.00 Tm
+(akf_i2a_control  @1020: 00029901) Tj
+/F3 8 Tf
+1 0 0 1 54 500.00 Tm
+(akf_i2a_recv0    @1038: 00000012) Tj
+/F3 8 Tf
+1 0 0 1 54 489.00 Tm
+(akf_i2a_recv1    @103c: 06000000) Tj
+/F1 10 Tf
+1 0 0 1 54 469.00 Tm
+(Expanded decoder confirmed the same repeating sequence, now labelled with) Tj
+/F1 10 Tf
+1 0 0 1 54 456.00 Tm
+(candidate management fields:) Tj
+/F3 8 Tf
+1 0 0 1 54 434.00 Tm
+(0600000000000012 mgmt_type=60 major=0 sub=0 low16=0012 low8=12) Tj
+/F3 8 Tf
+1 0 0 1 54 423.00 Tm
+(0600000000000004 mgmt_type=60 major=0 sub=0 low16=0004 low8=04) Tj
+/F3 8 Tf
+1 0 0 1 54 412.00 Tm
+(00b0000000000010 mgmt_type=0b major=0 sub=0 low16=0010 low8=10) Tj
+/F3 8 Tf
+1 0 0 1 54 401.00 Tm
+(0070000000000001 mgmt_type=07 major=0 sub=0 low16=0001 low8=01) Tj
+/F1 10 Tf
+1 0 0 1 54 381.00 Tm
+(The device still did not expose internal NAND to Linux:) Tj
+/F3 8 Tf
+1 0 0 1 54 359.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 348.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 337.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 326.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 306.00 Tm
+(Conclusion: the new run confirms the controller is active and the old-management) Tj
+/F1 10 Tf
+1 0 0 1 54 293.00 Tm
+(traffic is stable, but no storage block device appears from decoding alone. The) Tj
+/F1 10 Tf
+1 0 0 1 54 280.00 Tm
+(next code step is to implement a real old-RTBuddy management state machine:) Tj
+/F1 10 Tf
+1 0 0 1 54 267.00 Tm
+(parse and track the 0x60, 0x0b, and 0x07 management events with state,) Tj
+/F1 10 Tf
+1 0 0 1 54 254.00 Tm
+(status, version/pinger fields, then derive an ordered response sequence from) Tj
+/F1 10 Tf
+1 0 0 1 54 241.00 Tm
+(the iOS RTBuddyManagementEndpoint behavior.) Tj
+/F2 14 Tf
+1 0 0 1 54 215.00 Tm
+(2026-05-18 old RTBuddy state-machine scaffold) Tj
+/F1 10 Tf
+1 0 0 1 54 189.00 Tm
+(Added a first Linux-side state-machine scaffold to) Tj
+/F1 10 Tf
+1 0 0 1 54 176.00 Tm
+(drivers/soc/apple/t7000-ans-probe.c.) Tj
+/F1 10 Tf
+1 0 0 1 54 158.00 Tm
+(New sysfs view:) Tj
+/F3 8 Tf
+1 0 0 1 54 136.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_state) Tj
+/F1 10 Tf
+1 0 0 1 54 116.00 Tm
+(The new view samples the AKF receive mailbox, classifies the observed A8) Tj
+/F1 10 Tf
+1 0 0 1 54 103.00 Tm
+(management events, and tracks:) Tj
+/F3 8 Tf
+1 0 0 1 54 81.00 Tm
+(phase) Tj
+/F3 8 Tf
+1 0 0 1 54 70.00 Tm
+(last_msg) Tj
+ET
+endstream
 endobj
 21 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1831
->>
-stream
-Gb!$GgMZ%0&;KZF'Q[1q/Rh<$_/]ksW3_uL#"TDGj)$FcZpi_c,Z795S)iruUgtd3%k<fKfEMagVE!YWTDo<g+M]pUTCW-B@LE)^![NH`!_D[s0YN4al,iZ5d^2]&GVKYa(ZGmKh$\u49#1n\@mWZCOX.k`TU$tX)/8ugSdOgG`*Qa,,MVhS5:^IkP>$Uj#.2U(0];)+R/RKB?YnXRpjNs*G^`s(D[)]br^Q9O]oXMWd1ErEM9gec]SNB$38GKL=q<%<\GnC0Z!V^e*m=.GdeMop^7PPrqIU/3(jVl;%/pUHL8kV<L*[L,nMuOsVBjLGoA(/*SoFOpjbmb""hePV<Xc?tMCodnZ=Hp[*KZ#tHU%q[4&B)kjngPf,d$=\6s_WPdtH2LSTn/#3G03d;5:SUWFBrEK;g5Z(X$tqmD$Fo;#!r9HnL>O"[/'*Po%O4$mfP;_`^qMjgMikDB$r*c9M^R@r/ScI6&EpE/!Zo/MaKtrCSlB90-]>VZLH=nA:pBcX9ck[qJLV7AWl<L?H*aAH1SOPnXY0\YpR=<aA?:^WVeSL[O2u\*bmQP3$-Zj2n2\\$T$NTXfd(i+GAWb>f>f6B4OnKY1%;m#e&$ONFrH5MY+C]))?lk3kMf^PsV)lc\1WG3HT7AnC3YU]S@RR&X^*j-r+PDaee@@?euW<9or^Cf]294F.e:h8I(>]c#^TX?30qk*8h<R/@73\7/UmH3A3s@I'O2%GrO9gos9NMU<CP<D1o*-?.cOM%kSeaU=(T/l:O/fej@"=M:2$O@q2CRPc]p*SNN3=AqunnHc:8-iRK%M^loAI&,HLFf%,Z']@-X'[Q9#>pQoHJ*iUg38.4(<`7d;XjBi.P\g!j6EhCl^D:Y8Xk/V-cP8q`gX[hhqY*hu#Pd$7`PVH-1r[3Q@m;rAVGW:pkUHnq5Tr6\+m;_\_J,\nh3>pY?$p<$+4ZO>Opg:cHCGQ8aigObfuDN-,>R8_1s"&&L^rBW]C+]g<s<Jp!o9S*mp5P!S(uOu@XH]*cK5qRSDWeK#Ad/5,1BpF3bTs"Q:BFHZ@N^'>'4GJffiT+X(Bo%39eDl<a:"`E>&#kS%!Q9FCENgBK`Eh-?@cAD*>5NpqY:i?"uguQ+="jen#@-1DDYrWM7DhA`CObcL8$@U.DBo8t>=SpGa/dp"?MM.j?fB<^P;2@m+'JW7J?n/<h^NW_"<5Jb*^#VoE7/"s9DVmur=>+<1lCA:Qm;)h4N+k-?P&9%q.Bl&MhZV5,cHMi-\".>bWd[EF:R)?CQALQkOF[H(!WPY7H*.<MAQ-jbp0UhiQL]euP9>GKKJg=LB5;k&ntA!>+:o?k@UM`:+?&0247.-R4cBTlXb:9hZ'=lRPLgK&)\R&Ip\AZFUJL)^X@dN8pq$ES!Q4jn%S;n(U`^0'Wi4\LRRZBigsggbQe^)hBZO3WNsj1:Ea^d5?J=Mn"gf.*ZD#L">bnk-);_g:P#+3[?f<'?@Q.G]sJ/6]O:oTZP'(SFh\mlI4u_h6_=d$R$gZ/DXtn?(G,O6s0U0KPMt61%3("<-Y=W3;i#Dl<Vc\_(8"AnSe%%-:rrFT;Aq%a!,f,&cCn)ftH!"jk&V,51fc-Gd:336[-tc-o+%r^K&q.d^^PB^d!>1p"(Ao'qfB?Uj;-0M:5f;,^"F+!8-F,5ST;NeUQ^T2h4m\BQ]BV@YkJmE(8JGoja:mR`<^l<Q\7B?B:%D#8n!I\>P[B1=>!@+:eqMHR2\KDBV@B;p="5mt<(=&X$N8)^UUYK[I$@>5^RKl/--JpjjCGTM<sjMfZdAF@MTi)_,D2f3LPTpNsaN^a/%At-gP3;F(j;`2r~>endstream
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 20 0 R >>
 endobj
 22 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1404
->>
+<< /Length 3494 >>
 stream
-Gau`RD/\Gm%0#*j_(PnrTs5n*EK^G-ReBpX5]b1RDdNUc<`6'.jcea`]jF"HDfP4)B(&Y0_ktP2'M7gL"bJsB?DA4m.KoL3!qd[@"!'BH#k-_!4Sa"aCX$jL_I,EF4>];`.HP;cJu5nDo1.(C_R'@hp)`24(2RqAZR@90OP)X]B+CQN.sE;9JXi-@&/m>"#.]o#4EKFeAAo<.Q@\$-(U"f\('Dm?PUgA4'?iX)Th3I(@9".4'`(<*ItR5<(a-tY6S,bO2'C=0i@3)Hl1ZpF.cU6ZSNSQ4Q,r1.3]/[UM$"p8chQ'j0=\;r0arUZ0Ul1*euEkfNDs_HNYD\r:.ns#/65Ze:h["Rc6<`r_/+,gj>:J9eXuC+D.WmRafIi2>\DuVl%mao3-=NGh06CN<JgFR?=fQQAXYdA"[b$ddP>-rcgMnt(2T1+D+"M]CNCa6YH@>d4$'K9>EuO!i2.5sE)h_4Pbk[NjY8)Xo17k^-\S#'-^)GN$t^Vn\V;j^pXX6p#HjATb;+M1OU2m;>d_l&leiI`3(Iag<)mHuU`:0A[Q:ZeRE0nI#-2fKp!5O_)Oj(.lSTI/(aZD1:a!(W-%D3u5?92lI=)1o:Vaia&%.3J?ET4)S:BnJ*s^BE%h$A.;Pb3`Nu(Kp*ljjJSY1#j_jS2D_\?UgY$Khg].11W-d5[H2s.:finA5_lsRE\K&cCU`AIYjoQ^,rc/SuNnI,lO)(H+nEEF9eNnVD<o(JFIqp2VEbsbFu>/ff_q-k,r?/=Bh8HjLQ!u<XV"Q$DW[>c4TPA*:jNEKaf)ZA%mCP1ZC]AGF[EiI#ZIR1C`C-eFD'fQr)l*7'B.J-'Z=F\GliZ$_HM=P_7Z&A%l8$/<JaX97BkcgS?*dJ8[mD5\`pg-bo?@tHdrgpb-hs8,QHfFeSq#,Vd&&*Mn^H?l#Sil$4""^o+Z!>!dRFi*Md7?toFs^q3k/k6sQl(M(e\HVI=Y/GkI&%4t.unGDpOM5?1Vt>uQ6]BbO%:iMffAN:SZtX9s+tPj#''CA^qhOaQ/&r.*O[4!fXE/r!mYYXA<J(C[6Du!6Z-[iO:@gs''*2c949h]iat(M,??f'WuP*nXU`72q<FNuIt7gih$t+l0(E^ca$rRNnNZAmL(_8iK->652tD?DGWSHSQsnOkM@EE/il*grm-2*gT)6c%Ft&aC[H?+#CF)n`P@d1Xo\=lse/`[B]9N:Rb_DJ+T:n1.:]E>\r@a?u`EID41*%s7-^OGY!k>$hZe9(#O6pX&T%4@J`Zn"SfB&gf'0<,lFp3:0['mc,))S+q58sG<J$"-@BCZXmg.-?:+0\<7V,1Nb4CbFFQPO+RG`LCE$ti2?;"HA^T]TRl;0.+EhmI'c7+;W/hI4HV2AX>WfI\OU9FaHhSf'N`*O,L7])~>endstream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(seen state12/state04/ap_power10/iop_ack01) Tj
+/F3 8 Tf
+1 0 0 1 54 727.00 Tm
+(loop_count) Tj
+/F3 8 Tf
+1 0 0 1 54 716.00 Tm
+(repeat_state12) Tj
+/F3 8 Tf
+1 0 0 1 54 705.00 Tm
+(iop_state) Tj
+/F3 8 Tf
+1 0 0 1 54 694.00 Tm
+(ap_power_state) Tj
+/F3 8 Tf
+1 0 0 1 54 683.00 Tm
+(iop_ack_state) Tj
+/F3 8 Tf
+1 0 0 1 54 672.00 Tm
+(last mailbox control bits) Tj
+/F1 10 Tf
+1 0 0 1 54 652.00 Tm
+(The scaffold deliberately does not send replies yet. Its purpose is to make the) Tj
+/F1 10 Tf
+1 0 0 1 54 639.00 Tm
+(driver treat the observed values as an ordered protocol state instead of) Tj
+/F1 10 Tf
+1 0 0 1 54 626.00 Tm
+(isolated hex samples. That gives the next patch a place to add an ordered) Tj
+/F1 10 Tf
+1 0 0 1 54 613.00 Tm
+(reply path and later an ANSEndpoint1 start path.) Tj
+/F1 10 Tf
+1 0 0 1 54 595.00 Tm
+(Built and packaged:) Tj
+/F3 8 Tf
+1 0 0 1 54 573.00 Tm
+(artifacts/m1n1-linux-t7000-n56-oldrtbuddy-state.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 562.00 Tm
+(/tmp/m1n1-linux-t7000-n56-oldrtbuddy-state.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 542.00 Tm
+(Kernel build result:) Tj
+/F3 8 Tf
+1 0 0 1 54 520.00 Tm
+(make LLVM=1 ARCH=arm64 Image.gz dtbs) Tj
+/F3 8 Tf
+1 0 0 1 54 509.00 Tm
+(completed successfully) Tj
+/F2 14 Tf
+1 0 0 1 54 481.00 Tm
+(2026-05-18 phone run with ordered reply build) Tj
+/F1 10 Tf
+1 0 0 1 54 455.00 Tm
+(Booted the ordered-reply build on the iPhone 6 Plus and confirmed the new sysfs) Tj
+/F1 10 Tf
+1 0 0 1 54 442.00 Tm
+(path exists on the phone:) Tj
+/F3 8 Tf
+1 0 0 1 54 420.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_plan) Tj
+/F1 10 Tf
+1 0 0 1 54 400.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 378.00 Tm
+(artifacts/ordered-reply-plan-2026-05-18-2238.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 358.00 Tm
+(Phone-side result:) Tj
+/F3 8 Tf
+1 0 0 1 54 336.00 Tm
+(oldrtbuddy_ordered_reply=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 325.00 Tm
+(stable=1 samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001 ) Tj
+/F3 8 Tf
+1 0 0 1 54 314.00 Tm
+(loop_count=7 seen_mask=f) Tj
+/F3 8 Tf
+1 0 0 1 54 303.00 Tm
+(phases: state12 expects 0600000000000012, state04 expects 0600000000000004, ap_power10 ) Tj
+/F3 8 Tf
+1 0 0 1 54 292.00 Tm
+(expects 00b0000000000010, iop_ack01 expects 0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 281.00 Tm
+(guard=requires stable four-message management loop, matching current phase, exact expected ) Tj
+/F3 8 Tf
+1 0 0 1 54 270.00 Tm
+(message, and non-full AP-to-IOP mailbox) Tj
+/F1 10 Tf
+1 0 0 1 54 250.00 Tm
+(The state-machine view still sees the same stable loop:) Tj
+/F3 8 Tf
+1 0 0 1 54 228.00 Tm
+(oldrtbuddy_state=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 217.00 Tm
+(samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 206.00 Tm
+(seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f) Tj
+/F3 8 Tf
+1 0 0 1 54 195.00 Tm
+(loop_count=7 repeat_state12=32 iop_state=0004 ap_power_state=0010 iop_ack_state=0001) Tj
+/F1 10 Tf
+1 0 0 1 54 175.00 Tm
+(Storage result is still unchanged:) Tj
+/F3 8 Tf
+1 0 0 1 54 153.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 142.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 131.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 120.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 100.00 Tm
+(Conclusion: the ordered state-machine reply path is now live on the phone. No) Tj
+/F1 10 Tf
+1 0 0 1 54 87.00 Tm
+(reply was sent in this run. The next experiment should choose a specific) Tj
+/F1 10 Tf
+1 0 0 1 54 74.00 Tm
+(management acknowledgement sequence and send it through oldrtbuddy_ordered_reply) Tj
+ET
+endstream
 endobj
 23 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1925
->>
-stream
-Gatm<gN)%,&:O:Slq=6oCQ\[sCM)"OF.6_"8_mKsp-9`GYpKJU!%k6YhZ\8PNOJ1IBTHtnMoB0"m+Fa)+S\D(-SGJVc62sSJ]9BJ!$-^pQsIO`g"H*Ug/nhTG]OjgE.SJCI_"$=Tle,P($RU)m#60N]f\Y`[.@%`rN&9I$&lcao0*UnkPQ<m88bc$h.jdp$+T:1@H8/bKBkI`r<osh%p%&#`T6P(G_!O>O"a2Gob"q,7lhQA6Ph0l]'+MsLqC!Dp1/.A=^%Ll/M+5rP-;[("C0fr$hEXZ5f'aRXr^uAa],Ac1Otc\8./+gY[Rg4P/2W7/%CO&"$T:BMe-MIVn%>'AKeAa\<9mn]K:4N!r"7LKRm*r*t*?@"]Qf;>VMRaE*'[BnV@E,cf>_O#FG2Y*9XCSEtL6K2NP>f4GQmKpHnmp5SU'N7#NP@@@gVD=UJK-fn<X=n*<7$(eKScbji`&!8hBqE3Z[,hn_e7&AF#,r0o8@h@ug0&<h&n#n4Dk()cR=BNA8e^).ni/PW]aP8Y7$nO_iP^(f9%&JXB&1!#'l//NOL.$ZlI_lCKu)fU>Hdt(MA"hr7<<b].]XX.2/!mB,2<sW=*hY,#3:<.l/_\Q&l)<!H-OA#nD:*?@M(k4X4MF$&20m9#S[u#$ZR)GbM$j6G!'#22/m.+S=YtkTZSA]7UrJfI&Hahojda)Q.1F^n20SFIG(N%D.cm;%MV-3*,>\]O)*-2CX5$VClL$?T"?_%I;0Yq(F!F*M'&[(&'F^#[PFkbs7m]cq=`qC1+ZWh>=6dr34^>aiL&puOidRB,lia)DL**bR"L_LTS[%dej73]Zt/)s*\`/*[[HcnN?4G2n&cGfnT,gRU)/&bZJe'T\BElIL!Jk?q!bp.D@#^K3]S!@0H\ttG#A?*9r_gF3[O^;3&pDHK`WJp<UY4C(nAI"j/6g(&u3PuS]!-t5S0)$>me>/AJJKpS[gQ3iTHgEc&`7.iA,EOLR6;$3maA&g>l3Ks!Ok/]8JM`mTSC!PFoaI:^B8!8m]3HLJSET(N3,*1#dPe[[mK8ZL_FK9dB>o`,8B-:KouFu]k2$Ta_VZ8?TtB0kUt;B(imm/0)=h&$)\*oDoF9?TXuEG;D4Dm4f[+aWBfsi2*:Gh^XeFWu[,5c'@AaO(@D2>C6"n\^fQlOk3$QBaST<@G9O,UT+2t`;9$f9V,R06T%GS"KSuqmg+;rTLL)J8m2dF&g5b,6'c3(6nBfH!P/hXoq7*"<sXC_h[[\p?$`q]?Bme03<`TAf)mcAEf!?#\qOSS;OZL_J:kNf)ua1bi>$25<bH\2T@Z]&uBe-W(o@S9[DV,ap.p$"$bM__urCjf!(-P@M^?8sd@96P71"^`_B-=!$Vp_+jX1"!Wh;406+p4sWIO('jf"(r?(BqhAT4I55boStgj4e:jq$=h)d-llO<2a6?Z>\PH0:04\.@3`Kf6Ln=LA[2q_#[WunKY=W_]DCI(5j?naQYkKCV-k2sfi,?cqhIZfdl-f$pUGAo`WmM[SfI8$$#)^s6=I<O1+D[VjEY>798:oI?Z2H<Fug%M2Rkm!Ci.U@[S[d>m41lSK9sXl7jD)(;9=dW<9i<Tg;=I<%]X<(A7D)P(Rja:pPZ0cdOFt88KCk;s$k@Lq,D=pRKd>d.94h]WbnG1BQ)GoEB,\BZ#f+Yd/+$"M>/4B;J";)*i7l5m%SPB/oRo_"U,X(5<h=q-0FH"e5l(:M0UZaEXpnXV9$AUS;;_iSt6F/>9/b0#I$K6qg,tVb)3PF'Kn4//Q'U+6E:1EJ,H3iUFL,WE>`gR,Roub\+DD%e0)!nCQlpn6TD6%h?OW*7@WQRhUToUIIE^sH\2'j5Df(RH5;HDcX25651l/GTYk1Xg'@KhToGp62P!'*A.CPEGJs#mPi+6EiP/A65Q!<[TT93#rWf%rdqo~>endstream
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 22 0 R >>
 endobj
 24 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1760
->>
+<< /Length 3362 >>
 stream
-Gb!#[gMZ%0&:Ml+bY*Mo=NR?a9D/DfR\3qod05sS7UH7$U2;e$V'W+nrqd0s8\W2^ZAYFa&6RGD1NUk2E(GQ<+*IVT$K,=sUJDS;"LA9Y,YVV>"b*#uI(c5EjZ(5qeG[^oRi`[d?du)b`phuM.<\(KSQan.;KQ#()i(q6Ko=!5KrJ@+C.H"R/ULedje[Rfq3_kYHj#$3`TKaYr=-**]HN3O;dN+llI$VHS7.ZFjO@"I=cdMi9)OQidBeS72fu3$B6dsbGlBJ"kZohWKZ7X6LD=keoEu_C-mEhr9]T]BVUM:WXl7"[Gg[s,UU,]glhHESAFkiq53^#Wq=PL%kVO9+rieA<rJfnnG5TTcMK@.W61t`mFO.o6LSc[sr;hSqbI.t&$+8iFk*U&fCF5!p3B(a!AT+Pm_f:5/bR0\H'o.Z<[cA0iAk5hkY:Z)$s*0XM8Nu/c_'44nI7D[ela+Y#"Rs;>,h[SgoDKP;mmD9&eg3r.EU$JI(F=G6VrG9>%;;NH>U$US4+r;E>W%BXAje4jL`&:W3AAFSFdnk$iV`QZr&K+;MdecZDjljHB:j['r+fB,4-lQ!>2sPg#e$6JoY;TQ'ip$nOYjJqqub"Yhj>t[$3una@jj;`1_6eZ8s16[OJMY^&<^`okla=6NptX,9Spe<68`fi9cQJ3M:-p5"+2])-4?tGbEf,Z(BFS=DP:LnZ=_);E0:Op_`@ARRIP+[o@#K%\+`>=Q+H#q",1,U=_f7&KUt,1C2g=m4nb(X$\]Nml&i.?&[PGqN30".8KBXfT(=Z)-LEqP?J-c!8pgu:nn3-oAC19/U>p?Y65Y]G.>]1+BpL+!WP3_DPCr\?jUf`:n7f^OaaPK?@,a`lLD,GTimDju7#,GZmINI.!t]_XYf'WUe.PpW2MI>7Vb%7d_>S;E#2Q;H.-L9c8g,P'rs#pmgL.@#hiki#\A_1r.I@^rh9H"9MAsI7]NR9_f1Hn8n-o6'&J!/<fYt+Vq"+rR/o+eaWoS<]mqD>k"FS+-K7VtfOJBBI](r3h3PpGU=P9G"[CDP+^<X4U1Zj=9FJStHltG6/cU,M^UX[XokVQM:riOl)DL:[i=T0l;Fib"EXP+_eJ<2Q@U>d>DQ5CerD#MYaO:+b/P%.-'R:,?O3-uK+%#LYp=/aaT<%YiZe!\+d2QJ>p&W`i.C\b%gSj-)!r.C$:TI7q5;#b_'E/`iLEkh0kTmZQ<^0+T0=%kt]^K;eb&\14ZO9p,oGniS!`\Z,>kLCC@ZY4_(=i@LDM//gB($@q7nC6ldTe"ndPNeR(+^Q)42<2i8"n!3jWi2]oelKBhr$`l2Bn1dIGRY,F64R!R10*q3$0N^rdWb,,g[$JE_J8L6nfBVu\$3J[Wtu[HfDORHb3N*>hIPL&B!HrbCb'$JZ0.7[l^9F9gh!+r`h!qFNe1Sls%<uVKoPTH<1H]F9*if!/&mW#fB`lEQCKh@NP'ueU#/LJG2OAg*:0-.J50SeRZ4i\!6qZOMI$PGQ`e[(^%[fQC&Io^/!XGt*FDoV-&+-&lapT\e.$j,AY+U$1>@Q@V:K$Kdl[<;X8KT)HdAZ%P+;8titm.%pO+-1="*7lkSiQ1FCTZC&FY8<q]PK9*oo!cEoc9M7co,0a*H$Q5-eH8oIu>a(VAq@h<XnVnD8S=/TQ316Ns6!J2_,R)0B$fCMXLGFU6#>7p^3_;)W]VD&mda`a.-klc9''ht\;c,Hd6?EqH3cs/+@;F8m(6obrOUk:>FD*JFPRrr=*en4`~>endstream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(so the driver refuses to write unless the controller is at the matching phase.) Tj
+/F2 14 Tf
+1 0 0 1 54 712.00 Tm
+(2026-05-19 first ordered-reply test and guard improvement) Tj
+/F1 10 Tf
+1 0 0 1 54 686.00 Tm
+(Booted the ordered-reply image again and tested a canonical/type-6 byte-order) Tj
+/F1 10 Tf
+1 0 0 1 54 673.00 Tm
+(candidate through the guarded sysfs path:) Tj
+/F3 8 Tf
+1 0 0 1 54 651.00 Tm
+(echo 'ap_power10 0060000000000010' > ) Tj
+/F3 8 Tf
+1 0 0 1 54 640.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_ordered_reply) Tj
+/F1 10 Tf
+1 0 0 1 54 620.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 598.00 Tm
+(artifacts/oldrtbuddy-ordered-reply-2026-05-19-181808.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 578.00 Tm
+(The write returned:) Tj
+/F3 8 Tf
+1 0 0 1 54 556.00 Tm
+(sh: write error: Resource temporarily unavailable) Tj
+/F3 8 Tf
+1 0 0 1 54 545.00 Tm
+(SEND_STATUS 1) Tj
+/F1 10 Tf
+1 0 0 1 54 525.00 Tm
+(This means the guard refused to send. The pre-send state was still good:) Tj
+/F3 8 Tf
+1 0 0 1 54 503.00 Tm
+(oldrtbuddy_ordered_reply=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 492.00 Tm
+(stable=1 samples=64 unknown=0 phase=stable-management-loop) Tj
+/F3 8 Tf
+1 0 0 1 54 481.00 Tm
+(last_msg=0070000000000001 loop_count=7 seen_mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 461.00 Tm
+(The likely reason is that oldrtbuddy_ordered_reply first sampled the stable) Tj
+/F1 10 Tf
+1 0 0 1 54 448.00 Tm
+(loop and then checked only one instant of the rotating mailbox. By the time the) Tj
+/F1 10 Tf
+1 0 0 1 54 435.00 Tm
+(write path checked the current value, the mailbox was no longer exactly at) Tj
+/F1 10 Tf
+1 0 0 1 54 422.00 Tm
+(ap_power10, so it correctly returned -EAGAIN instead of sending.) Tj
+/F1 10 Tf
+1 0 0 1 54 404.00 Tm
+(Updated drivers/soc/apple/t7000-ans-probe.c so) Tj
+/F1 10 Tf
+1 0 0 1 54 391.00 Tm
+(oldrtbuddy_ordered_reply now:) Tj
+/F1 10 Tf
+1 0 0 1 54 373.00 Tm
+(1. Confirms the full stable four-message loop.) Tj
+/F1 10 Tf
+1 0 0 1 54 360.00 Tm
+(2. Waits briefly for the requested phase to appear.) Tj
+/F1 10 Tf
+1 0 0 1 54 347.00 Tm
+(3. Sends only if the live message exactly matches the requested phase.) Tj
+/F1 10 Tf
+1 0 0 1 54 334.00 Tm
+(4. Logs wait_samples when it sends.) Tj
+/F1 10 Tf
+1 0 0 1 54 316.00 Tm
+(Built and packaged the updated image:) Tj
+/F3 8 Tf
+1 0 0 1 54 294.00 Tm
+(artifacts/m1n1-linux-t7000-n56-ordered-reply-wait.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 283.00 Tm
+(/tmp/m1n1-linux-t7000-n56-ordered-reply-wait.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 263.00 Tm
+(Kernel build result:) Tj
+/F3 8 Tf
+1 0 0 1 54 241.00 Tm
+(make LLVM=1 ARCH=arm64 Image.gz dtbs) Tj
+/F3 8 Tf
+1 0 0 1 54 230.00 Tm
+(completed successfully) Tj
+/F1 10 Tf
+1 0 0 1 54 210.00 Tm
+(The phone then reported normal iOS mode, so the updated image still needs a) Tj
+/F1 10 Tf
+1 0 0 1 54 197.00 Tm
+(fresh DFU run before the canonical/type-6 candidate can be tested for real.) Tj
+/F2 14 Tf
+1 0 0 1 54 171.00 Tm
+(2026-05-19 ordered phase-wait send test) Tj
+/F1 10 Tf
+1 0 0 1 54 145.00 Tm
+(Booted the updated phase-wait image:) Tj
+/F3 8 Tf
+1 0 0 1 54 123.00 Tm
+(/tmp/m1n1-linux-t7000-n56-ordered-reply-wait.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 103.00 Tm
+(Ran the same canonical/type-6 byte-order candidate again:) Tj
+/F3 8 Tf
+1 0 0 1 54 81.00 Tm
+(echo 'ap_power10 0060000000000010' > ) Tj
+/F3 8 Tf
+1 0 0 1 54 70.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_ordered_reply) Tj
+ET
+endstream
 endobj
 25 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1531
->>
-stream
-GauHK?$#!`'Re<2\1aCE4)6&YK2!CJA[C(Wc?9iSd'oQSKIt!!/NJt:jPT]([eU29+e'6&%$BYp^$"6nFA.8DS%?qA!;JO,en5=HJDgWEk_Cki")`i0Nu,1[g$.L*'SLpc2rH`:lY:`s\'e9`d-ncSW+$A9*M[anXNQZ&)P2PKEL:90r0HnAVHcF/So`"O?rN?t?ip(AD7B'^92,<n;K/#KR7_HnnM5U.qAG%f_!i/0i1KdnO^tp;qlrldVh*h@W=!5kgjghs+DK%VY-Mq4jEGIh4Y5&oc'K_Pn89nI/&d54$Ec7Ungbhn9\(jhR[c!9MX,[0Y=#e/10t_.FfHY28,?C)KnZe=FXqG=XU`1nG=!gJadjo*(Oh),hcFat[.L\BNT[lQk02Hd=t*fh$.l;0`$D]Kq+TufH^KaK([3?;N9YR+7?@^R@?3)4mo@G/BPlb\e-hU1SC43fnVLs"4/4PN^UZ%$mUit:=[&-EW"X^cbNF'!,Vu%g?j!p,"oXOJj_F:M2P@B&=HJHhkS4M%R@/X'cf3YhFQqWR^\#:teeco:?@K*Z"_def;C)0.QTMlu7GLsgflhOWPJ@%Os6J.YVpWc^mrtQ(S(lmM3nB$\e:+H/>dMl&'aMu!#Ttq$C@"@W;^#'dS"TJbOn3>Pna(4AXRo-\`0D.#T^.`#7q7VRg0NSeNt,Zt*PMu8]<UL5iKR-aEs$61S9De\o/V@m(t%r>0T6Ko&nE5O@n:3*9JN/rOp+aQ"A(p.(s@7mP*F>D88J2ak;\p'OYjV6DU.b7Y;W=T845AD@ImB@lUl-c&dc#K^0Y9d0Q&.Z?Sd`,_l\Sc=E.n4<[SV34cFHM4?t2u^l\.]+\[-VmBX<'.[dY94(fn(6LW@W5Mk$NdWo3bm8r@tNH10-2?*$/S"WMLh)t)%8X<oB,0LnDXo+hVW/6U/q-ZS>#9ICo=H`1%T&AXA(V0S5F/,'D?p$B0iSRi8KJ\siAm3q[/9qft.Hfr[(J`g$#ei,G5o,tp.tAkbdKQrZf"\o=J"(sm2;k;MOd9+GTt=mCG)PeG&+6KYT&5fNfQ>([?$o*!P?pdo$pO%]phc@:(#&f^>`SH]j4[[A<lPC7QGR_0pV,Jn49We%U_=W"oW9b*I)!,Se$ME@K2Hl2]+Kf$2eFKkSrg$3mCo253F^hTkg!tg>B!PEJggUAlX='/b]mG<gl6ec>E?dE.%]pE_,nirr,QX@W^EM8?pD7JA2i2<KgW]pRPS5=cjejdAb65&]A(J?`((thp\lP0&HqM$dUo/i=:m][V'YuHfg*<$_JB@.r1M_VghfL?[HFcHGlf$*T&miCQ73(.6,2knLD35"*.FZ9`)i5Mi#A2'p=\L41)9O\;XN3alIJ.&mgI_XE]a/[?]-7;HmG<>f>L=*j6c.D-,!e/C33o\MlJ-<#=skL=WOp<!3Ls*R?trHjF"f8lL;3J)X5U<EE:`4S%00^RHiMM$GIsGkhFl)cNL;pjMorFI(2:7%g(A[^!grI%j#hF#G9?RWP>J70)c$\GABh~>endstream
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 24 0 R >>
 endobj
 26 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1812
->>
+<< /Length 3097 >>
 stream
-GauHK?#SIU'Re<2\1[rsU&(E5a`[jsE1:Ag\u&Wi4r]GK`LJ5O-)i0hpUd4HIjD<?\&E/+La>s3pRHTV4X/hEQe9&E!UtOBhA$&(^aoR#\fo;sL<J9'[klI8N+0FZ$:6\e%<rn;OS(t-2hG05,Vn,eX!&&3>fl=6+63M4]Ln("X/ONQF&ArE@J4V\B"N-b9(P.M[1H+b"]=D4\=J)'PcLV^>,Ir/$rfN4c0*a`YYn->e@C"Slo,UF5PTX=EBKi&Z&/7B)p'iY$`Z'WDlBIE?#7-P"MW!rj=nH1(tSmH`iKB-(;B+o?P7KO%LSc`k9=(*YHEtXY[.MKO=$om0MZe2,X",9&7q$V$6_M:`QFF3&("drJUQJRp\s:gpcW<>9J^B;mFshYg?t/rm0-FG4ttp99s+V`6A);EN$fU5!A2lad.EHd$%qL8*UlsbT(DI&AXQR#Dtfd`ok_.M\^NlS!3_a$0Z0\!Jb:2W*)"Dh";TGp'.fI.,:bK4GS5&m%dn+L5hHXhPqn_-S0^)*VCK!%Um*FX+S+$MNo>0T^/!.B2uRh%"YDHp_IP9eWj'4B<8"aL@H-_uk=^Q[9Vn\W1@@ol"[1_Y4Qlh%lf2_mRih(]9"B_(-0fg<gR7BJp_eYK:I7Cfi0#M(s'Bh@fJH6ORUMIkCg/4TK@o]=#Ceqe<2R`fs6Re\.+)Q3ROPA!KG=*'$@,":bjb/(<=N863WABD_`D;5P"\fL73F@t8jE"!VMVqrdnMG8]]Yq6UUH["b;jtJEjIC"$=uqX$BJ``*ELa)WULB[E@aqNVe!'1V4[]`?Q1B9;ESBU2o-Kq3*:7WYCE[=D]dDX4LjA`&N$:(dG/[\\`8l1f4o-*lE]R[>E5OT;If<`g1d6BLYd2/5YG/>X3J5Xc`XA:Cf,>XGLj3p5JKs30.np?IQT!oI/;gNr9j-%2IFZ)+JG('-0s6"7U8IsXZX2=S@0"LjNI('LBPo"9,o^D7]q3kLPA88#7[]21O$l9%F[757je6lENNW>6JTkP2\>/-)re^V--d$.&2uU=gi,psdFLll%r^ojOb?I[:a?mdHbq6WC\K?[=j?Hpq7V%0bW-K:G.9>s/F:o2mJL]hU;S4/\X,c+2fm[[,qTtjXAHoq$>kW)2pI?scu:sZ*9'aBTtMJ\[t8d?&+R,HoGF#[Hj,^*YK;2QF+23lVEA]H'=qIBNZC\;c/EtpII[1uqeJY81:+7rfG`$-!$0_g^nHL9lQ]=N#Y2QW%`?a(W!TFZ9FHeV/a1WO-Bf?ba6oOe$BDe`p]L4`2H,N/79@$ml,tdd=Bb%/),<r.BlU>DI)MJ&q[@CHX"fPZHU^%QWsg@uNZH,u92(c7O3D3njoIBSDlYnLO`X;!R1oho06^_g8qKiBcpo]6P)KWR2TB^WQ0g8VUkt6p,0S=a@6j0ZZH$R'5ba:`TB=n4['1<#"+2J<brAK.$k`T@e(*Dra<]ud3H\/H<NT\FO2"g?1_@P6(>O'e=QJ09QgrjuW#TXj&qWm(FNY8M,,:@Y#EAcMQR<<=Q-(V&ngLldW>==o;bJ\lY6fRt\^A'HGY[85`oHl3'=YHh<bH]0o#t@\E^gdbH"H].%Oi'JL>RdP"WDp.8;"af_7&Hh(M;5>6#7C1k3)GJL+SUm'NZ=lM?M>ZBu4h*=ma"fZK)Qjk5IE<K:%e[pY$rn\r=hL]KnIERLTNfc1!;Q>+<[pAY\("!&=1C_f.SY_`],Oi\%?0=ks9FGA;So\R?_3R%d)IS%6n\Hofu13I/$0'tFDW_)LkpWeAmR,%\ei]?JVu0m]IumFV%A/3*M;Tr[t=~>endstream
+BT
+/F1 10 Tf
+1 0 0 1 54 733.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 711.00 Tm
+(artifacts/oldrtbuddy-ordered-reply-2026-05-19-182724.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 691.00 Tm
+(This time the guarded write succeeded:) Tj
+/F3 8 Tf
+1 0 0 1 54 669.00 Tm
+(SEND_ORDERED_REPLY ap_power10 0060000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 658.00 Tm
+(SEND_STATUS 0) Tj
+/F1 10 Tf
+1 0 0 1 54 638.00 Tm
+(Before the send, the controller was in the known stable loop:) Tj
+/F3 8 Tf
+1 0 0 1 54 616.00 Tm
+(oldrtbuddy_ordered_reply=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 605.00 Tm
+(stable=1 samples=64 unknown=0 phase=stable-management-loop) Tj
+/F3 8 Tf
+1 0 0 1 54 594.00 Tm
+(last_msg=0070000000000001 loop_count=7 seen_mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 574.00 Tm
+(After the send, the controller was still in the same management loop:) Tj
+/F3 8 Tf
+1 0 0 1 54 552.00 Tm
+(oldrtbuddy_ordered_reply=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 541.00 Tm
+(stable=1 samples=64 unknown=0 phase=ap-power-0x10) Tj
+/F3 8 Tf
+1 0 0 1 54 530.00 Tm
+(last_msg=00b0000000000010 loop_count=8 seen_mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 510.00 Tm
+(Storage did not appear:) Tj
+/F3 8 Tf
+1 0 0 1 54 488.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 477.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 466.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 455.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 435.00 Tm
+(Post-check capture:) Tj
+/F3 8 Tf
+1 0 0 1 54 413.00 Tm
+(artifacts/oldrtbuddy-ordered-reply-postcheck-2026-05-19-182836.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 393.00 Tm
+(akf_decode after the send still showed the same four-message cycle:) Tj
+/F3 8 Tf
+1 0 0 1 54 371.00 Tm
+(0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 360.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 349.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 338.00 Tm
+(00b0000000000010) Tj
+/F1 10 Tf
+1 0 0 1 54 318.00 Tm
+(Conclusion: the ordered phase-wait send path works, and the canonical/type-6) Tj
+/F1 10 Tf
+1 0 0 1 54 305.00 Tm
+(reply candidate was accepted by the mailbox, but it did not advance ANS to) Tj
+/F1 10 Tf
+1 0 0 1 54 292.00 Tm
+(ANSEndpoint1 or expose internal NAND. The blocker is now more specific:) Tj
+/F1 10 Tf
+1 0 0 1 54 279.00 Tm
+(Linux needs the real old RTBuddy management transaction format, likely more) Tj
+/F1 10 Tf
+1 0 0 1 54 266.00 Tm
+(than one 64-bit acknowledgement value.) Tj
+/F2 14 Tf
+1 0 0 1 54 240.00 Tm
+(2026-05-19 ordered reply matrix) Tj
+/F1 10 Tf
+1 0 0 1 54 214.00 Tm
+(Booted the phase-wait ordered-reply image again and ran a small guarded matrix) Tj
+/F1 10 Tf
+1 0 0 1 54 201.00 Tm
+(of plausible single-value responses. Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 179.00 Tm
+(artifacts/oldrtbuddy-reply-matrix-2026-05-19-184300.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 159.00 Tm
+(Every write went through oldrtbuddy_ordered_reply, so each send was gated by:) Tj
+/F1 10 Tf
+1 0 0 1 54 141.00 Tm
+(1. stable four-message loop observed first,) Tj
+/F1 10 Tf
+1 0 0 1 54 128.00 Tm
+(2. requested phase seen live,) Tj
+/F1 10 Tf
+1 0 0 1 54 115.00 Tm
+(3. exact current message matched for that phase,) Tj
+/F1 10 Tf
+1 0 0 1 54 102.00 Tm
+(4. AP-to-IOP mailbox not full.) Tj
+/F1 10 Tf
+1 0 0 1 54 84.00 Tm
+(Tested:) Tj
+ET
+endstream
 endobj
 27 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1755
->>
-stream
-Gat=+D,91O&H9tY(nGa]HQjU^I77>1b00(s60XYL5HV;5*Ok^(fYMa(gonI1V_;bRD?YPeD3*lQR:k:l,5dH!J"?[GNT'e>$ulBh;i$oO'?9cc4$IpMM3jC-2K![j8GqQCTb14?1?P)tL<Qlca@hrS#qCha]&U"(is[eP5_hNuTbfUXo-r9oaRVG.@:J;u0O^Rh\'ledJk]-_Q"p;G,@2Z4?XWdbN;k#=rn6ljlB"4`#OFCe<bWX#Ms)t:f(/P'Z<S?hPQRL4CP@I1>-?6dO^)d,gp>[K28\d:Z>e2QQj4^V^N9-/r#W&c<]13%AA(&C?PQ0'rkK5;M+f=AX--^\j`Vr1m6:nUc0OZi_"IkoksR1B"P8Ja];HnJ/D]_ss(V8hZp?XO>9iZ9#j\Kphk\BNR+W+a^V?f'*\o&;]q/6u2K5Y`hFKP'g,d?b'0>=fDQ^C9b#t?X@I:7;eS=a!)Li`0j1,0cp]S,]<\'J.pC7LN$olouR0A?YehR.4G0Y,J"E)J%q]fKaG[qi6)PA9<8(c]^%Tk&!BEc.BSY+S9g?l;C`G[Wq>i3\`I[+#U3!-5)e\^`XlOTRfpYmc?^A4,icCfb&^XuNA0*gB)rJ*1:.KPNs2&7l7%/!CaWo%2+Mfn]1[P'hd,K_0@+P>0Pcter!eV2s+^hVhZi`'ZFVtNZL)a,C%O0D6_M\*"ooKfJ_H(M2[3<^gq/TP;eO[+Xa6%q(G$`%<,Vo!b`1k=4i'`b4>&`6/[C8E0a6c->`/:=9_jjr8Y<fU<K"BhH&b*+<\$*I@l%sXN.2nF[Bf*/;Id;FJY$7AQnS4'juC7XKJ"f-Do[Aq;r6^C+,:4ma#[3J_-Qcg5[@K^>E>@4kW)/+-Fk$$G1l6q%V*F1%rs4hX;"3Fhen`8kPoJh<4I_>^VrH@gdr;rCo^?rAjQ5VA/D\n!A:0d*9UE0[pTdk=9bOFQa`tt->ctWo<C"93DP1"+,%(V7I01:f`WiYVO(NgHrAfm(=@FR%5;kl/@`XSnX:Xt?Q[9t5:b6E4E`d+I`2IG-VeJ;E_"e=F?91(h2V!l*X/hdgm'XbqQqT/T9.R$:1eo,_kQ_<\8Ql)^qS6C>TK[lHH(<pMgUJI'gWSgl:cW//I#$1^NJBp*YV?L0HD_YJ"[CPbhH(A?D7aPYSW)jtZqu5/^NZ0j=+cPTI>k]7B:,cJrjLu('i99386-Y&&Qq3Cf'8sa0U!iC1$,d]>SOsBjOrA"o\Y@*6]U*,,AiR[NUZ[@5hqHj/qYld"@r"DVUHaC(/bteS7@"Mn#@7e+6Xi<QX:mUZ]LW^>3\;@Gf*MC5N`,SR$fXoebiZhr3A\_iX*0p>L4S!`--`M?k%mVLI]TXRo@+S$l@Z&MBju)%+Z'?s4H\`S#Yb[o;\2#F:Sk;S<m0kf?/4kMRP'QQpsXdJl8@V3$Xo!TTOti$$d4se^]ENZ@+S2E7au)V;(KFnia;(\$3b@rbs<n$N.U1`RKSmJ-ekiE!tI6D[B._;:($rQN&%e\^gO_UXcOfo[](JJ5^/bIM?9YkJ-7PlP--5b[4l(Y)1ssCI3ELH30lcafqX1P*N+b4f8m9$=fgU*Q)[phV8'%\%bUA0^as-)bQVR6iC%S'gptW!cWmQHlX%%/l>mKsI'/`bM:OM1W7d@,UE,hf>([HHL!t2on<__u.YN0>SDM[R]0lqV/B<U"`5%1$Qoe3(m`,ZSn8$dU%f;Y%2SD?tS"X&r?Y-Onqck14CG^B1fSpkGrWgrpQ$i~>endstream
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 26 0 R >>
 endobj
 28 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1761
->>
+<< /Length 3378 >>
 stream
-Gatm;D/\/e&H88.EF/op6S+AjH[l)h[h]h3B&2b@"sm,$>=qjcg2ZuTG9eKfNo0,1$/d6(q=rb$F3gC+&H&C(2(J^abp!'OJL3'(J.A=tbWiuAq9AL?D(J1e4IchMq9;^-2(t1HRC,0WbVZpThF^#gTHi1dVU67C-$gWJ`'"kiM\>3`=-c0)N;1]eaX/0a5[?!!\+f)r<EW2iKsAk)bWX.N=S&.nrY=S13(/6<?m68>l1kI:@5J<.0KS3b0trdjn;.I>WXZJ-ptadA#FCA_pNf9lj&;)HDoI;S@ZdY4C*`n0V1_P2!0`LT)5/XBcHu&1-NN"b&oZu_NZ6EtE9I_NhX\HYo5*6.$s+5KTnB+pS];-JK>W+u,%5i7,QVC1S%ZZ%%!Slr9\WrgEn%>,H>qs1@n[_6VkHYZ\3O[SamaaXZRY,uj?-@$f75"Z6C2q+QQ-Da3G;`?Aju@qL-MkdQ18(We-eg5E[fE,7G&nskXX]).4A?<Sp8@-gP&]7/ou)bCnor#3HGAW&l5[*FDLL!-5t%)dOsm%c0r[U&Um^uS'J*5I$NuNNpjXr5#1Qjb-LJj%"H2)>'W&;\910e>r6*4%7s?h+Uo?qj(>S5eZPC`.5\Ct6dJXYTcs*\bK1`<P4Q*&O=aL($-31DLBYDkQ/Ni8bB:cL4?bn,%T^D9;6;_mW%a`8U?V\GKt,\`Mef2lYX2>o(A9R88JL,6*Hc"kbu:UIDrfj;C]XjJ@0$6'7Lu!,Kk0SJYDiX1^Sr]H.tcLBI+)*n`JoMY'obFoUdegO$3O^!!4JDI;ou\em5hJ?'ns`!+c:XsZ!YtF`M.H/)65StK+G%8+02Zm[=LZF1?a;TGpZP1,FEgc)[fCfcn2GlHRu'CCDj9dW"`?H#NhZS]2bH;DKE;kkJn'q2-YrqhZ;<I1kB=p=BmibA$1u3Y'OV7-I(d5K>$$7Q6\V*l#&Iq4ZTn+;)$pDHo44L4S7C!,e?j$$YunNn_tJ9L#iVEGO$HP0TA+-$C&PC'MH\FN@a.]R"g"#\A_f^>3C5\Rr!Q=:qa('>)>^UpS"L4ajrfCk^8!l`_"A*LlCk:!YLh0.@idn7gV@"8jMUD"SX2!r_q][#t`-b1@!o7=EnMPL/di8.YGj)OSJMQ9S;$G*r:F'HH=nNA!hU[Cf$M5&Y>rAE&c\qOs,%GdO$k#(YB+Ya4BKlT2hbL)NsY>4&#FG4OZk@e$['hLb`@E9jqE]pr`iW*"[GPlo_tV`cu3fY"W(nAt>t^k_"^*1*o:HGp5pRN-Wo2Fk-1Yle,i,)%Y$=QSU/7]TGUK"h0S$@=fagr:pB*.H@SIb-9CP67/*T!dcWRW75e"7W(=^&%gPr6J'LhIkL+:F>C@D0MP"a#?/<HVTW-RESEorT!n4,;*TG?BbL<XA;Im'eEVa'8n+LZ"X;gV2Pn9c9W`IRYHYVj)E6KWqs7Y:HEH3da3>oK:*%nDjm?T1<*44%"#M/kgO&DlrTuSk2/gd:8@_2TneH2!Q$2JJq\nBn<U!-Ub&%92TPi@3*OZMDX%N)FHWl)'a,u"rg#GX?igRt(3au]&]28a5atVC#`'f<#OQE,BoWPK'ct(6W/P4dF7/'K%Q"^FacHhs4Cl)&Dh1aR$[kjH6q>Qn_0g)gLqUsuCC\Rh%DEU+2Ba4]&1(b(up=CoMB[pqq?`!&D8kA8VejpQmZM[$.@2E5B[?<T9SG6QMHX24"OGQV6dD#8,+,%6ENVcqFlMI;EWMmCma0r(Qs-O<'DZ0g>]73`~>endstream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(ap_power10 0060000000000010  canonical/type6 ap-power candidate) Tj
+/F3 8 Tf
+1 0 0 1 54 727.00 Tm
+(ap_power10 00b0000000000010  old-layout ap-power echo) Tj
+/F3 8 Tf
+1 0 0 1 54 716.00 Tm
+(ap_power10 00b0000000000020  old-layout ap-power next-state candidate) Tj
+/F3 8 Tf
+1 0 0 1 54 705.00 Tm
+(iop_ack01  0070000000000001  old-layout iop-ack echo) Tj
+/F3 8 Tf
+1 0 0 1 54 694.00 Tm
+(iop_ack01  0060000000000001  canonical/type6 iop-ack candidate) Tj
+/F3 8 Tf
+1 0 0 1 54 683.00 Tm
+(state12    0060000000000012  canonical/type6 state12 candidate) Tj
+/F3 8 Tf
+1 0 0 1 54 672.00 Tm
+(state04    0060000000000004  canonical/type6 state04 candidate) Tj
+/F1 10 Tf
+1 0 0 1 54 652.00 Tm
+(All seven writes returned success:) Tj
+/F3 8 Tf
+1 0 0 1 54 630.00 Tm
+(MATRIX_STATUS_1 0) Tj
+/F3 8 Tf
+1 0 0 1 54 619.00 Tm
+(MATRIX_STATUS_2 0) Tj
+/F3 8 Tf
+1 0 0 1 54 608.00 Tm
+(MATRIX_STATUS_3 0) Tj
+/F3 8 Tf
+1 0 0 1 54 597.00 Tm
+(MATRIX_STATUS_4 0) Tj
+/F3 8 Tf
+1 0 0 1 54 586.00 Tm
+(MATRIX_STATUS_5 0) Tj
+/F3 8 Tf
+1 0 0 1 54 575.00 Tm
+(MATRIX_STATUS_6 0) Tj
+/F3 8 Tf
+1 0 0 1 54 564.00 Tm
+(MATRIX_STATUS_7 0) Tj
+/F1 10 Tf
+1 0 0 1 54 544.00 Tm
+(None of them advanced ANS out of the same management loop. After each send,) Tj
+/F1 10 Tf
+1 0 0 1 54 531.00 Tm
+(oldrtbuddy_state / oldrtbuddy_plan still reported:) Tj
+/F3 8 Tf
+1 0 0 1 54 509.00 Tm
+(stable=1) Tj
+/F3 8 Tf
+1 0 0 1 54 498.00 Tm
+(unknown=0) Tj
+/F3 8 Tf
+1 0 0 1 54 487.00 Tm
+(seen_mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 467.00 Tm
+(akf_decode still showed the same repeating messages:) Tj
+/F3 8 Tf
+1 0 0 1 54 445.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 434.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 423.00 Tm
+(00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 412.00 Tm
+(0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 392.00 Tm
+(Storage still did not appear:) Tj
+/F3 8 Tf
+1 0 0 1 54 370.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 359.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 348.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 337.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 317.00 Tm
+(Conclusion: the mailbox send path is working and can safely target specific) Tj
+/F1 10 Tf
+1 0 0 1 54 304.00 Tm
+(old RTBuddy phases, but the obvious single-word responses are insufficient.) Tj
+/F1 10 Tf
+1 0 0 1 54 291.00 Tm
+(The remaining blocker is almost certainly the higher-level old RTBuddy) Tj
+/F1 10 Tf
+1 0 0 1 54 278.00 Tm
+(transaction structure: message headers, payload buffers, sequence/status fields,) Tj
+/F1 10 Tf
+1 0 0 1 54 265.00 Tm
+(or endpoint-map/start exchanges rather than one standalone 64-bit value.) Tj
+/F2 14 Tf
+1 0 0 1 54 239.00 Tm
+(2026-05-19 guarded transaction-plan phone run) Tj
+/F1 10 Tf
+1 0 0 1 54 213.00 Tm
+(Added a guarded multi-step transaction test path to) Tj
+/F1 10 Tf
+1 0 0 1 54 200.00 Tm
+(drivers/soc/apple/t7000-ans-probe.c and booted it on the iPhone 6 Plus.) Tj
+/F1 10 Tf
+1 0 0 1 54 182.00 Tm
+(New sysfs files:) Tj
+/F3 8 Tf
+1 0 0 1 54 160.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_transaction_plan) Tj
+/F3 8 Tf
+1 0 0 1 54 149.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_transaction) Tj
+/F1 10 Tf
+1 0 0 1 54 129.00 Tm
+(Built and booted:) Tj
+/F3 8 Tf
+1 0 0 1 54 107.00 Tm
+(artifacts/m1n1-linux-t7000-n56-oldrtb-transaction.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 96.00 Tm
+(/tmp/m1n1-linux-t7000-n56-oldrtb-transaction.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 76.00 Tm
+(Capture saved at:) Tj
+ET
+endstream
 endobj
 29 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1635
->>
-stream
-Gb"/'?#T9l'Ya%>3&d&Re-*gF&3=h$p=6$?laH4%g+>(:"'uX&[@KYYlZ_\\piojWW0[Sm-'!C;T(DaI#n[aH7fG?I!:Hc3s"T+]_R+hA%V(ki_@P+bQ^_YEF-tnDLrLUW"ZT9T\6dtKd\sJfLI7G0XY&P8dFut#lM\r7j<`"h;<FO^BhEaH/PQ1rl$(G#n+]%dQAj9HFj@^Hd_&Df@b1,JM.u[DF7bj.h?P_A'Bab%iB$EBHfjhmpua;o#X3\4r6p>`.Z*,X@LF50reB4Rbr2"sVQ.5gkR1(JA_`ZI.Ef2Q@#mZLOuCgVRulQ&14kUHj![MCN.r%M^.,,^PTng&V:<OW#u(IV%.L]3.`jt8&luk%60XnTm\$W([hct>nAU#s9UF>q?7D5S?1P,P@*^DQkoYa0+(54HARg84*&8fJTrZF9a]Dm,9OXT+QiLJ$A'K2%cgDbRW2no("E6g0fD>4rOT)mIrOQOjRHiu5<FB\@Pb]QOp^*?FI9#F`cC6qGS)I%dZK<EMUUqN'c`FR7k$Zgl@`?W0KOL>/mt]i:ZkWbf/7uJ#fYAdPm)Tu>3_2WM[\j*B-GqaCb5q+V$&lt$J!5J/Hr9m\jBWq]/+<aoR7CZU)Kkr7=>hfm.YV;+#g<F:U63c"XlP-XF.)!NG"tjgM$d.#BnK<_)G4W.X>5\?+X=;eM4h3Ck05[3837]?iEXYXAtCA=2o.R0GCV:s7n)S+RUa<e,R5+LD**Bgn&upE/[0P%Wtj4ukpCP%#at/9,I\dL16t(5[%5121qLYaL?X)[q+Ds:K$_@8Kkb^+Tjf2oYepZMcF5c@Z_``ka;V2:Yg;qWSKT4:/oa*t4uS.5]s^HX"/j'+kp`hdGkgY4m>5kdeu(JGO.tqW3^o&!n7%5[cl?AGdk`L."K\'^.Y\)bgY?(pk@fg+7P>o?os?kPA09t8JNo1(4.F=@Ng"@![+rR"*QRZHUC^`RnbRe2\EPuZZ`UnAodecj*-F?Dh&'%7@sg3e3a$fMFgLXo<SC<['djQ);trgo9-tH;5?$c367u4''8>l+>%RZd.CU$aRa-%OZ\jDZr^Of]T!A+(<*4[S7S[D]a)nBDLCfGLN*9K[OkSrKVjW\cFoWB6h1!Od[!gX4_KQ%e-ZThln]DBrJIm91Rs?N=O?8:1mPuo84t,bqRelG]h.hZ[?=M,V2;"C/9;N%%"pWUG'I):u+lj+o/pY1A2^i$<B&!b&]$!B]-XP+O[;$K#<fUEj[[FmWL2:Ji0^=3d5.t32Xr;@3)WRV\_+G*YO\`J]>:IDFa_FhA3"=>Jed_%^\5c;=M8Rg'UKd;;?o-M[97,JC6N(JAmk?`$ZcQ<HW,p34*K7/g*STZJbQak"\kHg6[#VSpqc+o:TG4\7#M'2l+GWOmj$DTX#j:2X`u*bCc'<m&@E04]+-c\0^Nc"0@CJeL\Sa,?Nit[(rN!j[c2<KR5Ef/@5G'5i6nWeL(q>V's+C(D_;"PfCr?^N<^qdi:9tA@83rZU8^h[+1ZMJPh[gEEm@(Ql3CT?XE#iF0Uuf2=*.u3t#n!f74V^0Td[=A8Vo-,nk=F#!EAqh&VNo6ZZI10_*cV!c]&Uj*J-SuS"J/O,X8<19[Wl[nX<?p3IOMF>o+.lGmd^~>endstream
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 28 0 R >>
 endobj
 30 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1731
->>
+<< /Length 3351 >>
 stream
-Gatm<D/\/e&H88.EF4HH"!ggNr)THmP+opQVHqajqeFIjD0)CAKr"'G^OA[FQL4H9BcI@4Cl,aTkFT;,"9e`Ks.8?Q2\YD(NZa3f15@7a':@RlVodK,<E,UW&+JR4:;Rhi_!ApGf8D/,1hrg4@36hA-&]:Z.';rKFoJgAdffiu9IVN3"/S\X<%_;Hr`>Kb$^9J<_S>U/RF8p-i&`Fej\E.mdQ+_$ATq,&'1ToM1t#UUK4-`Y7eeKI7CUVnm1rZ*DRkq-;;KVV-Xhi";89Z-gMA39H;>$R7!g7F2`Q[FK24sNHnnA;PtXV\d'i[fb@UJT;QXA!%8[HR>+_'/T*Y_A;TjZ^VFrNZX>jF:RY+m$:a1PX&`co#]Q5DO#c3Ci-?r=l8)$"%:n')R/6.O&cj]q#.%N*;18dc-!M3BpL)[PY260P;-I/ZH>.'PeD0<-"2.M_WCmeU,b?&L!@jP!L@5<K.P"BTYSh0?.R^jf:3kRU/KlC[pa3G&LZ+?'`>!(>VArM@BmX/H_h.tNFa+C,n'dum2$dYTL^HpPj<Cd>h)F@!78JI.,N;>8X3_X%K_\`d$B5lof(mB1UOFD^e2o0SRq(]E/Zg;BRYV#S@LDtT#<EKEk>l\`7#+b'2gOtW'A"Vj>B<LU2a^%*D%B`Ga;EC5cP\JT(==:I("RFbb+XE`/":2a[$e+sGXm/YcCjZ,HJiHmDh\"K&aik4j,+*)<MLIsBL+#mMkS-meddF1nh*Os(A9B]:i[H\>R#FRf&Kr<PUl25&G31PA`KRUDhCG2$dkp`33l`nq0KoPsBY9Cbh@X9<ZZ\!aLloL"*7O=K$*M$l`mWjUVB10MTl!D+j6@G!CObIf)+qbNPrbkEED)Yq*!@"%?nmH+`<$cD6(tirPqnf*XD$l6,gBO,T#@D(+h^0[n5P&]d(Lpo0L,hQk7tsqBDsSVc5\0&F-m`l6EQYFFD_VQfrjCQMrC\';X?EkY%0<CZf<#dH=IT%!Bq"@\.99I,pj*XMlhjDa6QcIA6Xfq.Q<=m^E-8]]q8)+(RXdh[-$m'$C4@"9KSn(TilI'#/5qq293-kCJ*W.`0.(r+!QJT#$.(l"['K7\;Je8l/r2&>SK8tE\Q:4I%9\&;/a?7hW7qGLS8M4'a\e^U"Qlkh'tMMn1EKD(O-mkoeq*/\).qGJJEf:>gp2^H\mAN;)#!^D:QG[fa657Anp/aEdWG]]sB?3QR,b?LQ\&WfBnMM+>EQ9kF4A"aT[\OB,r:b3I8meUc"TEXBQ)7p&OQ'1TRXV-kYggo8%hBkSB43n@jCtqaU-,]t_8hX9u]>H0<$2-f7WW7K/OoqPnFU0<U6n]JG@M]8h;cXQmn"bSHY+EI&S;d9)+/Vh0+SrG]L\`oJ0<%POBD[X5tDL8YBQ3]\(hhW`rmg_Q,'<i+.kZ#Yar[GO/&lR/Ok2O>qLI>YYgH=mU>Kj0ZN'1`6]XTkL'hiRg9T!hT2a"j50Dj1k\iHAe?&d$6f9qV>i`cgMB*>6=W!kB$V<o7n9itdt<l`nOm!pG5VBstUCo!MMCV]r!aVee3TQaE2p5gIFDFD,Sb/uemeBKL)2FWfE)(2n^upTqXTWQB8R84J/Lqfbl=5I*KZlM(Q)>N(P09`$_$Ie&o%Qu)`[i+1WW1+eoE)29fFIq*1!gh?IP;9S2eKA5.1^3tgqqT$W@5#@d\')7X%^:!_H1-79dUf-;f`t?!6ESNLm&`A,3_U\[EgAVf~>endstream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(artifacts/oldrtbuddy-transaction-plans-2026-05-19-191213.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 718.00 Tm
+(Initial state after boot was unchanged and stable:) Tj
+/F3 8 Tf
+1 0 0 1 54 696.00 Tm
+(stable=1 samples=64 unknown=0 phase=stable-management-loop) Tj
+/F3 8 Tf
+1 0 0 1 54 685.00 Tm
+(last_msg=0070000000000001 loop_count=7 seen_mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 665.00 Tm
+(The transaction plans available in this build were:) Tj
+/F3 8 Tf
+1 0 0 1 54 643.00 Tm
+(canonical4) Tj
+/F3 8 Tf
+1 0 0 1 54 632.00 Tm
+(oldecho4) Tj
+/F3 8 Tf
+1 0 0 1 54 621.00 Tm
+(mixed-power-first) Tj
+/F3 8 Tf
+1 0 0 1 54 610.00 Tm
+(mixed-state-first) Tj
+/F1 10 Tf
+1 0 0 1 54 590.00 Tm
+(Results:) Tj
+/F3 8 Tf
+1 0 0 1 54 568.00 Tm
+(TRANSACTION_STATUS_1 canonical4        0) Tj
+/F3 8 Tf
+1 0 0 1 54 557.00 Tm
+(TRANSACTION_STATUS_2 oldecho4          0) Tj
+/F3 8 Tf
+1 0 0 1 54 546.00 Tm
+(TRANSACTION_STATUS_3 mixed-power-first 1, Resource busy) Tj
+/F3 8 Tf
+1 0 0 1 54 535.00 Tm
+(TRANSACTION_STATUS_4 mixed-state-first 1, Resource busy) Tj
+/F1 10 Tf
+1 0 0 1 54 515.00 Tm
+(canonical4 and oldecho4 successfully wrote their guarded multi-step) Tj
+/F1 10 Tf
+1 0 0 1 54 502.00 Tm
+(sequences, but neither advanced the controller out of the old RTBuddy) Tj
+/F1 10 Tf
+1 0 0 1 54 489.00 Tm
+(management loop. Internal NAND still did not appear:) Tj
+/F3 8 Tf
+1 0 0 1 54 467.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 456.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 445.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 434.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 414.00 Tm
+(After the successful plans, later sends hit Resource busy because the) Tj
+/F1 10 Tf
+1 0 0 1 54 401.00 Tm
+(AP-to-IOP AKF send mailbox became full:) Tj
+/F3 8 Tf
+1 0 0 1 54 379.00 Tm
+(last_controls: a2i=0001c401 i2a=00091901 i2a_empty=0 i2a_full=1) Tj
+/F1 10 Tf
+1 0 0 1 54 359.00 Tm
+(Conclusion: the guarded multi-step path also does not reach ANSEndpoint1.) Tj
+/F1 10 Tf
+1 0 0 1 54 346.00 Tm
+(This is useful negative evidence. The remaining work should move away from) Tj
+/F1 10 Tf
+1 0 0 1 54 333.00 Tm
+(more 64-bit mailbox-word combinations and toward the real old RTBuddy) Tj
+/F1 10 Tf
+1 0 0 1 54 320.00 Tm
+(transaction packet/buffer path: header, length, sequence/status fields, endpoint) Tj
+/F1 10 Tf
+1 0 0 1 54 307.00 Tm
+(map, endpoint start, then ASPStorage/ASPBlockStorage.) Tj
+/F2 14 Tf
+1 0 0 1 54 281.00 Tm
+(2026-05-19 old RTBuddy packet layout model) Tj
+/F1 10 Tf
+1 0 0 1 54 255.00 Tm
+(Implemented the first code-side model for the higher-level old RTBuddy) Tj
+/F1 10 Tf
+1 0 0 1 54 242.00 Tm
+(management packet format in drivers/soc/apple/t7000-ans-probe.c.) Tj
+/F1 10 Tf
+1 0 0 1 54 224.00 Tm
+(This is based on the local iOS 12.5.8 RTBuddyManagementEndpoint) Tj
+/F1 10 Tf
+1 0 0 1 54 211.00 Tm
+(disassembly around:) Tj
+/F3 8 Tf
+1 0 0 1 54 189.00 Tm
+(0xfffffff0080baa98) Tj
+/F1 10 Tf
+1 0 0 1 54 169.00 Tm
+(The modeled packet layout is:) Tj
+/F3 8 Tf
+1 0 0 1 54 147.00 Tm
+(packet + 0x00: 8-byte prefix copied by iOS from kernel rodata) Tj
+/F3 8 Tf
+1 0 0 1 54 136.00 Tm
+(packet + 0x08: word0) Tj
+/F3 8 Tf
+1 0 0 1 54 125.00 Tm
+(packet + 0x0c: word1) Tj
+/F3 8 Tf
+1 0 0 1 54 114.00 Tm
+(packet + 0x10: payload) Tj
+/F1 10 Tf
+1 0 0 1 54 94.00 Tm
+(The fixed prefix was recovered from the decompressed iOS 12.5.8 iPhone7) Tj
+/F1 10 Tf
+1 0 0 1 54 81.00 Tm
+(kernelcache. The disassembly loads it from:) Tj
+ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 30 0 R >>
+endobj
+32 0 obj
+<< /Length 3317 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(0xfffffff0070cb080) Tj
+/F1 10 Tf
+1 0 0 1 54 718.00 Tm
+(Address-to-file offset:) Tj
+/F3 8 Tf
+1 0 0 1 54 696.00 Tm
+(0xc7080) Tj
+/F1 10 Tf
+1 0 0 1 54 676.00 Tm
+(Bytes:) Tj
+/F3 8 Tf
+1 0 0 1 54 654.00 Tm
+(04 00 00 00 54 00 00 00) Tj
+/F1 10 Tf
+1 0 0 1 54 634.00 Tm
+(Two variants are now represented in the driver:) Tj
+/F3 8 Tf
+1 0 0 1 54 612.00 Tm
+(old-small:) Tj
+/F3 8 Tf
+1 0 0 1 54 601.00 Tm
+(  format      0x00) Tj
+/F3 8 Tf
+1 0 0 1 54 590.00 Tm
+(  word0       0x00000006) Tj
+/F3 8 Tf
+1 0 0 1 54 579.00 Tm
+(  word1       0x00000011) Tj
+/F3 8 Tf
+1 0 0 1 54 568.00 Tm
+(  payload_len 0x44) Tj
+/F3 8 Tf
+1 0 0 1 54 557.00 Tm
+(  total_len   0x54) Tj
+/F3 8 Tf
+1 0 0 1 54 541.00 Tm
+(old-0x40:) Tj
+/F3 8 Tf
+1 0 0 1 54 530.00 Tm
+(  format      0x40) Tj
+/F3 8 Tf
+1 0 0 1 54 519.00 Tm
+(  word0       0x00000007) Tj
+/F3 8 Tf
+1 0 0 1 54 508.00 Tm
+(  word1       0x00000044) Tj
+/F3 8 Tf
+1 0 0 1 54 497.00 Tm
+(  payload_len 0x110) Tj
+/F3 8 Tf
+1 0 0 1 54 486.00 Tm
+(  total_len   0x120) Tj
+/F1 10 Tf
+1 0 0 1 54 466.00 Tm
+(New sysfs files:) Tj
+/F3 8 Tf
+1 0 0 1 54 444.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_model) Tj
+/F3 8 Tf
+1 0 0 1 54 433.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_stage) Tj
+/F3 8 Tf
+1 0 0 1 54 422.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_dump) Tj
+/F1 10 Tf
+1 0 0 1 54 402.00 Tm
+(Usage:) Tj
+/F3 8 Tf
+1 0 0 1 54 380.00 Tm
+(cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_model) Tj
+/F3 8 Tf
+1 0 0 1 54 369.00 Tm
+(echo old-small > /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_stage) Tj
+/F3 8 Tf
+1 0 0 1 54 358.00 Tm
+(cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_dump) Tj
+/F3 8 Tf
+1 0 0 1 54 347.00 Tm
+(echo old-0x40 > /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_stage) Tj
+/F3 8 Tf
+1 0 0 1 54 336.00 Tm
+(cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_dump) Tj
+/F1 10 Tf
+1 0 0 1 54 316.00 Tm
+(Important: this does not send the packet to hardware yet. It stages and dumps) Tj
+/F1 10 Tf
+1 0 0 1 54 303.00 Tm
+(the inferred packet bytes inside the driver. That is deliberate. The next) Tj
+/F1 10 Tf
+1 0 0 1 54 290.00 Tm
+(missing piece is identifying the real shared-buffer address/path used by the) Tj
+/F1 10 Tf
+1 0 0 1 54 277.00 Tm
+(old A8 RTBuddy endpoint before packet writes are enabled.) Tj
+/F1 10 Tf
+1 0 0 1 54 259.00 Tm
+(Built successfully:) Tj
+/F3 8 Tf
+1 0 0 1 54 237.00 Tm
+(make LLVM=1 ARCH=arm64 Image.gz dtbs) Tj
+/F1 10 Tf
+1 0 0 1 54 217.00 Tm
+(Packaged:) Tj
+/F3 8 Tf
+1 0 0 1 54 195.00 Tm
+(artifacts/m1n1-linux-t7000-n56-oldrtb-packet-model.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 184.00 Tm
+(/tmp/m1n1-linux-t7000-n56-oldrtb-packet-model.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 164.00 Tm
+(Device validation:) Tj
+/F3 8 Tf
+1 0 0 1 54 142.00 Tm
+(artifacts/oldrtbuddy-packet-model-2026-05-19-205548.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 122.00 Tm
+(The packet-model image booted on the iPhone 6 Plus and exposed the new packet) Tj
+/F1 10 Tf
+1 0 0 1 54 109.00 Tm
+(sysfs files:) Tj
+/F3 8 Tf
+1 0 0 1 54 87.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_model) Tj
+/F3 8 Tf
+1 0 0 1 54 76.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_stage) Tj
+/F3 8 Tf
+1 0 0 1 54 65.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_dump) Tj
+ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 32 0 R >>
+endobj
+34 0 obj
+<< /Length 3463 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 729.00 Tm
+(Both modeled packet variants staged successfully:) Tj
+/F3 8 Tf
+1 0 0 1 54 707.00 Tm
+(STAGE_OLD_SMALL_STATUS 0) Tj
+/F3 8 Tf
+1 0 0 1 54 696.00 Tm
+(oldrtbuddy_packet_dump=v1 seq=1 format=0x00 len=0x54) Tj
+/F3 8 Tf
+1 0 0 1 54 685.00 Tm
+(prefix_status=unknown-rodata-zero-filled word0_le=06000000 word1_le=11000000) Tj
+/F3 8 Tf
+1 0 0 1 54 669.00 Tm
+(STAGE_OLD_40_STATUS 0) Tj
+/F3 8 Tf
+1 0 0 1 54 658.00 Tm
+(oldrtbuddy_packet_dump=v1 seq=2 format=0x40 len=0x120) Tj
+/F3 8 Tf
+1 0 0 1 54 647.00 Tm
+(prefix_status=unknown-rodata-zero-filled word0_le=07000000 word1_le=44000000) Tj
+/F1 10 Tf
+1 0 0 1 54 627.00 Tm
+(The controller state after staging was still the stable old RTBuddy management) Tj
+/F1 10 Tf
+1 0 0 1 54 614.00 Tm
+(loop:) Tj
+/F3 8 Tf
+1 0 0 1 54 592.00 Tm
+(oldrtbuddy_state=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 581.00 Tm
+(samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 570.00 Tm
+(seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f) Tj
+/F3 8 Tf
+1 0 0 1 54 559.00 Tm
+(loop_count=7) Tj
+/F1 10 Tf
+1 0 0 1 54 539.00 Tm
+(Storage result was unchanged:) Tj
+/F3 8 Tf
+1 0 0 1 54 517.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 506.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 495.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 484.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 464.00 Tm
+(Conclusion: the higher-level packet-builder path now exists and has been tested) Tj
+/F1 10 Tf
+1 0 0 1 54 451.00 Tm
+(on the phone. This still does not expose NAND because the staged buffer is not) Tj
+/F1 10 Tf
+1 0 0 1 54 438.00 Tm
+(yet a full old A8 RTBuddy transaction. The fixed iOS prefix is now known, but) Tj
+/F1 10 Tf
+1 0 0 1 54 425.00 Tm
+(the payload is still a placeholder:) Tj
+/F3 8 Tf
+1 0 0 1 54 403.00 Tm
+(prefix_le=0400000054000000) Tj
+/F3 8 Tf
+1 0 0 1 54 392.00 Tm
+(payload=diagnostic pattern) Tj
+/F1 10 Tf
+1 0 0 1 54 372.00 Tm
+(The next code step is to derive the real payload/shared-buffer path, then replace) Tj
+/F1 10 Tf
+1 0 0 1 54 359.00 Tm
+(the diagnostic pattern with a specific endpoint-map/start transaction before) Tj
+/F1 10 Tf
+1 0 0 1 54 346.00 Tm
+(enabling any guarded hardware send.) Tj
+/F1 10 Tf
+1 0 0 1 54 328.00 Tm
+(Implementation update:) Tj
+/F3 8 Tf
+1 0 0 1 54 306.00 Tm
+(drivers/soc/apple/t7000-ans-probe.c now stages prefix_le=0400000054000000) Tj
+/F2 14 Tf
+1 0 0 1 54 278.00 Tm
+(2026-05-19 DMA-backed packet staging) Tj
+/F1 10 Tf
+1 0 0 1 54 252.00 Tm
+(The next implementation step is now represented in code: the old RTBuddy packet) Tj
+/F1 10 Tf
+1 0 0 1 54 239.00 Tm
+(model no longer only lives in a normal kernel byte array. When) Tj
+/F1 10 Tf
+1 0 0 1 54 226.00 Tm
+(oldrtbuddy_packet_stage is used, the driver allocates a coherent DMA packet) Tj
+/F1 10 Tf
+1 0 0 1 54 213.00 Tm
+(buffer and copies the staged packet into it.) Tj
+/F1 10 Tf
+1 0 0 1 54 195.00 Tm
+(New behavior:) Tj
+/F3 8 Tf
+1 0 0 1 54 173.00 Tm
+(echo old-small > /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_stage) Tj
+/F3 8 Tf
+1 0 0 1 54 162.00 Tm
+(cat /sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_dump) Tj
+/F1 10 Tf
+1 0 0 1 54 142.00 Tm
+(Expected new diagnostic fields:) Tj
+/F3 8 Tf
+1 0 0 1 54 120.00 Tm
+(dma_packet allocated=1 dma=<device-visible address> size=0x120 copied_len=0x54) Tj
+/F3 8 Tf
+1 0 0 1 54 109.00 Tm
+(prefix_le=0400000054000000) Tj
+/F1 10 Tf
+1 0 0 1 54 89.00 Tm
+(For old-0x40, the copied length should be:) Tj
+/F3 8 Tf
+1 0 0 1 54 67.00 Tm
+(copied_len=0x120) Tj
+ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 34 0 R >>
+endobj
+36 0 obj
+<< /Length 3687 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 729.00 Tm
+(Important: this still does not send the DMA address/index to the storage) Tj
+/F1 10 Tf
+1 0 0 1 54 716.00 Tm
+(controller. It proves the Linux side can create a device-visible shared packet) Tj
+/F1 10 Tf
+1 0 0 1 54 703.00 Tm
+(buffer with the modeled old RTBuddy header. The missing step is still the exact) Tj
+/F1 10 Tf
+1 0 0 1 54 690.00 Tm
+(old RTBuddy mailbox command that tells ANS which shared buffer to consume, plus) Tj
+/F1 10 Tf
+1 0 0 1 54 677.00 Tm
+(the real payload contents instead of the current diagnostic pattern.) Tj
+/F1 10 Tf
+1 0 0 1 54 659.00 Tm
+(Build note: direct macOS rebuilding needs a no-space source path and Linux-style) Tj
+/F1 10 Tf
+1 0 0 1 54 646.00 Tm
+(host headers for kernel helper tools. The local macOS attempt reached host tool) Tj
+/F1 10 Tf
+1 0 0 1 54 633.00 Tm
+(compilation but then stopped in scripts/mod/modpost.c because the macOS/libelf) Tj
+/F1 10 Tf
+1 0 0 1 54 620.00 Tm
+(header path lacks several Linux ELF relocation constants. This was bypassed by) Tj
+/F1 10 Tf
+1 0 0 1 54 607.00 Tm
+(building inside an Ubuntu Docker container mounted at /work.) Tj
+/F1 10 Tf
+1 0 0 1 54 589.00 Tm
+(Docker build result:) Tj
+/F3 8 Tf
+1 0 0 1 54 567.00 Tm
+(make LLVM=1 ARCH=arm64 Image.gz dtbs) Tj
+/F1 10 Tf
+1 0 0 1 54 547.00 Tm
+(Completed successfully with the DMA-backed packet staging code.) Tj
+/F1 10 Tf
+1 0 0 1 54 529.00 Tm
+(Packaged:) Tj
+/F3 8 Tf
+1 0 0 1 54 507.00 Tm
+(artifacts/m1n1-linux-t7000-n56-oldrtb-dma-packet.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 496.00 Tm
+(/tmp/m1n1-linux-t7000-n56-oldrtb-dma-packet.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 476.00 Tm
+(Current phone state check after packaging showed the phone was still running) Tj
+/F1 10 Tf
+1 0 0 1 54 463.00 Tm
+(the previous packet-model build:) Tj
+/F3 8 Tf
+1 0 0 1 54 441.00 Tm
+(layout: +0x00 prefix[8] unknown-rodata) Tj
+/F3 8 Tf
+1 0 0 1 54 430.00 Tm
+(guard=this only stages bytes locally; no hardware send occurs until shared buffer addressing) Tj
+/F3 8 Tf
+1 0 0 1 54 419.00 Tm
+( is identified) Tj
+/F1 10 Tf
+1 0 0 1 54 399.00 Tm
+(So the DMA-backed packet staging image still needs to be booted on the phone for) Tj
+/F1 10 Tf
+1 0 0 1 54 386.00 Tm
+(the next validation.) Tj
+/F2 14 Tf
+1 0 0 1 54 360.00 Tm
+(2026-05-20 physical packet-buffer fallback phone run) Tj
+/F1 10 Tf
+1 0 0 1 54 334.00 Tm
+(Booted:) Tj
+/F3 8 Tf
+1 0 0 1 54 312.00 Tm
+(/tmp/m1n1-linux-t7000-n56-oldrtb-phys-packet.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 292.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 270.00 Tm
+(artifacts/oldrtbuddy-phys-packet-2026-05-20-000806.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 250.00 Tm
+(The phone booted the fallback build:) Tj
+/F3 8 Tf
+1 0 0 1 54 228.00 Tm
+(Linux \(none\) 7.1.0-rc3 #16 SMP PREEMPT Wed May 20 04:03:51 UTC 2026 aarch64 Linux) Tj
+/F1 10 Tf
+1 0 0 1 54 208.00 Tm
+(The old RTBuddy packet model now reports the recovered iOS prefix:) Tj
+/F3 8 Tf
+1 0 0 1 54 186.00 Tm
+(layout: +0x00 prefix[8]=0400000054000000, +0x08 word0, +0x0c word1, +0x10 payload) Tj
+/F1 10 Tf
+1 0 0 1 54 166.00 Tm
+(The normal coherent DMA allocation failed in the earlier #15 build, so this) Tj
+/F1 10 Tf
+1 0 0 1 54 153.00 Tm
+(build falls back to a zeroed physical page. That fallback worked on the phone.) Tj
+/F1 10 Tf
+1 0 0 1 54 135.00 Tm
+(old-small staged successfully:) Tj
+/F3 8 Tf
+1 0 0 1 54 113.00 Tm
+(STAGE_OLD_SMALL_PHYS_STATUS 0) Tj
+/F3 8 Tf
+1 0 0 1 54 102.00 Tm
+(oldrtbuddy_packet_dump=v1 seq=1 format=0x00 len=0x54) Tj
+/F3 8 Tf
+1 0 0 1 54 91.00 Tm
+(dma_packet allocated=1 mode=phys-fallback addr=0x0000000806476000 size=0x1000 ) Tj
+/F3 8 Tf
+1 0 0 1 54 80.00 Tm
+(copied_len=0x54) Tj
+/F3 8 Tf
+1 0 0 1 54 69.00 Tm
+(prefix_le=0400000054000000 word0_le=06000000 word1_le=11000000 payload_status=diagnostic-) Tj
+ET
+endstream
+endobj
+37 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 36 0 R >>
+endobj
+38 0 obj
+<< /Length 3397 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(pattern) Tj
+/F1 10 Tf
+1 0 0 1 54 718.00 Tm
+(old-0x40 staged successfully into the same physical packet buffer:) Tj
+/F3 8 Tf
+1 0 0 1 54 696.00 Tm
+(STAGE_OLD_40_PHYS_STATUS 0) Tj
+/F3 8 Tf
+1 0 0 1 54 685.00 Tm
+(oldrtbuddy_packet_dump=v1 seq=2 format=0x40 len=0x120) Tj
+/F3 8 Tf
+1 0 0 1 54 674.00 Tm
+(dma_packet allocated=1 mode=phys-fallback addr=0x0000000806476000 size=0x1000 ) Tj
+/F3 8 Tf
+1 0 0 1 54 663.00 Tm
+(copied_len=0x120) Tj
+/F3 8 Tf
+1 0 0 1 54 652.00 Tm
+(prefix_le=0400000054000000 word0_le=07000000 word1_le=44000000 payload_status=diagnostic-) Tj
+/F3 8 Tf
+1 0 0 1 54 641.00 Tm
+(pattern) Tj
+/F1 10 Tf
+1 0 0 1 54 621.00 Tm
+(This is the first phone run where Linux created a device-addressable old) Tj
+/F1 10 Tf
+1 0 0 1 54 608.00 Tm
+(RTBuddy packet buffer containing the recovered iOS header.) Tj
+/F1 10 Tf
+1 0 0 1 54 590.00 Tm
+(Storage result is still unchanged:) Tj
+/F3 8 Tf
+1 0 0 1 54 568.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 557.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 546.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 535.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 515.00 Tm
+(Controller state after staging remained the stable old RTBuddy management loop:) Tj
+/F3 8 Tf
+1 0 0 1 54 493.00 Tm
+(oldrtbuddy_state=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 482.00 Tm
+(samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 471.00 Tm
+(seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f) Tj
+/F3 8 Tf
+1 0 0 1 54 460.00 Tm
+(loop_count=7) Tj
+/F1 10 Tf
+1 0 0 1 54 440.00 Tm
+(Conclusion: the project has moved from "we can model a packet" to "Linux can) Tj
+/F1 10 Tf
+1 0 0 1 54 427.00 Tm
+(place the modeled packet at a real physical address on the phone." The next) Tj
+/F1 10 Tf
+1 0 0 1 54 414.00 Tm
+(blocker is identifying the exact old RTBuddy mailbox transaction that tells ANS) Tj
+/F1 10 Tf
+1 0 0 1 54 401.00 Tm
+(to consume that buffer, and replacing the diagnostic payload with the real) Tj
+/F1 10 Tf
+1 0 0 1 54 388.00 Tm
+(endpoint-map/start payload.) Tj
+/F2 14 Tf
+1 0 0 1 54 362.00 Tm
+(2026-05-18 device run with old RTBuddy state-machine scaffold) Tj
+/F1 10 Tf
+1 0 0 1 54 336.00 Tm
+(Booted:) Tj
+/F3 8 Tf
+1 0 0 1 54 314.00 Tm
+(/tmp/m1n1-linux-t7000-n56-oldrtbuddy-state.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 294.00 Tm
+(Capture saved at:) Tj
+/F3 8 Tf
+1 0 0 1 54 272.00 Tm
+(artifacts/oldrtbuddy-state-2026-05-18-2220.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 252.00 Tm
+(The new state-machine sysfs view worked:) Tj
+/F3 8 Tf
+1 0 0 1 54 230.00 Tm
+(oldrtbuddy_state=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 219.00 Tm
+(samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 208.00 Tm
+(seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f) Tj
+/F3 8 Tf
+1 0 0 1 54 197.00 Tm
+(loop_count=7 repeat_state12=32 iop_state=0004 ap_power_state=0010 iop_ack_state=0001) Tj
+/F3 8 Tf
+1 0 0 1 54 186.00 Tm
+(last_controls: a2i=0002cc01 i2a=00088901 i2a_empty=0 i2a_full=0) Tj
+/F1 10 Tf
+1 0 0 1 54 166.00 Tm
+(Interpretation from the driver:) Tj
+/F3 8 Tf
+1 0 0 1 54 144.00 Tm
+(controller is alive but still cycling in old RTBuddy management; endpoint map/start not ) Tj
+/F3 8 Tf
+1 0 0 1 54 133.00 Tm
+(reached) Tj
+/F1 10 Tf
+1 0 0 1 54 113.00 Tm
+(Storage result is unchanged:) Tj
+/F3 8 Tf
+1 0 0 1 54 91.00 Tm
+(/proc/partitions:) Tj
+/F3 8 Tf
+1 0 0 1 54 80.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 69.00 Tm
+(mtdblock0) Tj
+ET
+endstream
+endobj
+39 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 38 0 R >>
+endobj
+40 0 obj
+<< /Length 3467 >>
+stream
+BT
+/F3 8 Tf
+1 0 0 1 54 738.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 718.00 Tm
+(Conclusion: Linux now has a reproducible state-machine view of the old A8) Tj
+/F1 10 Tf
+1 0 0 1 54 705.00 Tm
+(management loop. The next patch should add an ordered reply path attached to) Tj
+/F1 10 Tf
+1 0 0 1 54 692.00 Tm
+(this state machine. That path should be conservative: only send when the state) Tj
+/F1 10 Tf
+1 0 0 1 54 679.00 Tm
+(machine has observed the full stable loop and the current message matches the) Tj
+/F1 10 Tf
+1 0 0 1 54 666.00 Tm
+(expected phase.) Tj
+/F2 14 Tf
+1 0 0 1 54 640.00 Tm
+(2026-05-18 ordered old RTBuddy reply path) Tj
+/F1 10 Tf
+1 0 0 1 54 614.00 Tm
+(Added the first ordered reply mechanism to) Tj
+/F1 10 Tf
+1 0 0 1 54 601.00 Tm
+(drivers/soc/apple/t7000-ans-probe.c.) Tj
+/F1 10 Tf
+1 0 0 1 54 583.00 Tm
+(New sysfs files:) Tj
+/F3 8 Tf
+1 0 0 1 54 561.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_plan) Tj
+/F3 8 Tf
+1 0 0 1 54 550.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_ordered_reply) Tj
+/F1 10 Tf
+1 0 0 1 54 530.00 Tm
+(oldrtbuddy_plan re-samples the AKF mailbox and reports whether the known) Tj
+/F1 10 Tf
+1 0 0 1 54 517.00 Tm
+(four-message management loop is stable. It also prints the accepted phase names:) Tj
+/F3 8 Tf
+1 0 0 1 54 495.00 Tm
+(state12     expects 0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 484.00 Tm
+(state04     expects 0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 473.00 Tm
+(ap_power10  expects 00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 462.00 Tm
+(iop_ack01   expects 0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 442.00 Tm
+(oldrtbuddy_ordered_reply is intentionally stricter than the older) Tj
+/F1 10 Tf
+1 0 0 1 54 429.00 Tm
+(akf_send_if_current helper. It will only write a reply if all of these are) Tj
+/F1 10 Tf
+1 0 0 1 54 416.00 Tm
+(true:) Tj
+/F1 10 Tf
+1 0 0 1 54 398.00 Tm
+(1. The driver observes the full four-message management loop.) Tj
+/F1 10 Tf
+1 0 0 1 54 385.00 Tm
+(2. No unknown AKF management messages appear in the sample window.) Tj
+/F1 10 Tf
+1 0 0 1 54 372.00 Tm
+(3. The requested phase matches the live current message.) Tj
+/F1 10 Tf
+1 0 0 1 54 359.00 Tm
+(4. The live current message exactly equals the expected value for that phase.) Tj
+/F1 10 Tf
+1 0 0 1 54 346.00 Tm
+(5. The AP-to-IOP AKF send mailbox is not full.) Tj
+/F1 10 Tf
+1 0 0 1 54 328.00 Tm
+(Example form:) Tj
+/F3 8 Tf
+1 0 0 1 54 306.00 Tm
+(echo 'ap_power10 00b0000000000020' > ) Tj
+/F3 8 Tf
+1 0 0 1 54 295.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_ordered_reply) Tj
+/F1 10 Tf
+1 0 0 1 54 275.00 Tm
+(This does not solve storage yet and does not invent a new RTBuddy response) Tj
+/F1 10 Tf
+1 0 0 1 54 262.00 Tm
+(sequence. It gives the next phone-side run a controlled way to test ordered) Tj
+/F1 10 Tf
+1 0 0 1 54 249.00 Tm
+(management acknowledgements without sending against the wrong phase of the) Tj
+/F1 10 Tf
+1 0 0 1 54 236.00 Tm
+(controller loop.) Tj
+/F1 10 Tf
+1 0 0 1 54 218.00 Tm
+(Built and packaged:) Tj
+/F3 8 Tf
+1 0 0 1 54 196.00 Tm
+(artifacts/m1n1-linux-t7000-n56-ordered-reply.bin) Tj
+/F3 8 Tf
+1 0 0 1 54 185.00 Tm
+(/tmp/m1n1-linux-t7000-n56-ordered-reply.bin) Tj
+/F1 10 Tf
+1 0 0 1 54 165.00 Tm
+(Kernel build result:) Tj
+/F3 8 Tf
+1 0 0 1 54 143.00 Tm
+(make LLVM=1 ARCH=arm64 Image.gz dtbs) Tj
+/F3 8 Tf
+1 0 0 1 54 132.00 Tm
+(completed successfully) Tj
+/F2 14 Tf
+1 0 0 1 54 104.00 Tm
+(2026-05-20 guarded packet-address candidate run) Tj
+/F1 10 Tf
+1 0 0 1 54 78.00 Tm
+(Added a guarded packet-address test path to) Tj
+ET
+endstream
+endobj
+41 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 40 0 R >>
+endobj
+42 0 obj
+<< /Length 3472 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(drivers/soc/apple/t7000-ans-probe.c.) Tj
+/F1 10 Tf
+1 0 0 1 54 720.00 Tm
+(New sysfs files:) Tj
+/F3 8 Tf
+1 0 0 1 54 698.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_addr_plan) Tj
+/F3 8 Tf
+1 0 0 1 54 687.00 Tm
+(/sys/bus/platform/devices/208040000.ans/oldrtbuddy_packet_addr_send) Tj
+/F1 10 Tf
+1 0 0 1 54 667.00 Tm
+(The new sender stages the recovered old RTBuddy packet first, confirms the) Tj
+/F1 10 Tf
+1 0 0 1 54 654.00 Tm
+(four-message management loop is stable, checks that the AKF AP-to-IOP mailbox is) Tj
+/F1 10 Tf
+1 0 0 1 54 641.00 Tm
+(not full, then sends exactly one named address candidate.) Tj
+/F1 10 Tf
+1 0 0 1 54 623.00 Tm
+(Tested on phone with kernel:) Tj
+/F3 8 Tf
+1 0 0 1 54 601.00 Tm
+(Linux \(none\) 7.1.0-rc3 #17 SMP PREEMPT Wed May 20 19:28:34 UTC 2026 aarch64 Linux) Tj
+/F1 10 Tf
+1 0 0 1 54 581.00 Tm
+(The staged packet buffer used the physical-address fallback:) Tj
+/F3 8 Tf
+1 0 0 1 54 559.00 Tm
+(addr=0x000000080543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 548.00 Tm
+(old-small len=0x54) Tj
+/F3 8 Tf
+1 0 0 1 54 537.00 Tm
+(old-0x40 len=0x120) Tj
+/F1 10 Tf
+1 0 0 1 54 517.00 Tm
+(Candidates tested in one boot:) Tj
+/F3 8 Tf
+1 0 0 1 54 495.00 Tm
+(old-small addr64          -> msg=000000080543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 484.00 Tm
+(old-0x40 addr64           -> msg=000000080543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 473.00 Tm
+(old-0x40 addr-shift4      -> msg=0000000080543a00) Tj
+/F3 8 Tf
+1 0 0 1 54 462.00 Tm
+(old-0x40 addr-shift12     -> msg=000000000080543a) Tj
+/F3 8 Tf
+1 0 0 1 54 451.00 Tm
+(old-0x40 addr-len         -> msg=000001200543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 440.00 Tm
+(old-0x40 len-addr         -> msg=0543a00000000120) Tj
+/F1 10 Tf
+1 0 0 1 54 420.00 Tm
+(All writes returned success from the Linux-side guarded path, but the controller) Tj
+/F1 10 Tf
+1 0 0 1 54 407.00 Tm
+(remained in the same stable management loop:) Tj
+/F3 8 Tf
+1 0 0 1 54 385.00 Tm
+(oldrtbuddy_state=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 374.00 Tm
+(samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001) Tj
+/F3 8 Tf
+1 0 0 1 54 363.00 Tm
+(seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 343.00 Tm
+(Storage result remained unchanged:) Tj
+/F3 8 Tf
+1 0 0 1 54 321.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 310.00 Tm
+(mtdblock0 16 KB) Tj
+/F3 8 Tf
+1 0 0 1 54 299.00 Tm
+(mtdblock1 128 KB) Tj
+/F1 10 Tf
+1 0 0 1 54 279.00 Tm
+(Conclusion: the missing transaction is not a plain physical address, shifted) Tj
+/F1 10 Tf
+1 0 0 1 54 266.00 Tm
+(address, or simple address/length pair sent through the 64-bit AKF mailbox. The) Tj
+/F1 10 Tf
+1 0 0 1 54 253.00 Tm
+(phone keeps answering, so the controller is alive, but it is not consuming the) Tj
+/F1 10 Tf
+1 0 0 1 54 240.00 Tm
+(staged packet from these address candidate messages.) Tj
+/F1 10 Tf
+1 0 0 1 54 222.00 Tm
+(The next real engineering step is to reconstruct the old RTBuddy shared-buffer) Tj
+/F1 10 Tf
+1 0 0 1 54 209.00 Tm
+(transaction structure around the iOS callback path: packet header, callback) Tj
+/F1 10 Tf
+1 0 0 1 54 196.00 Tm
+(arguments, sequence/status fields, endpoint-map buffer, and ANSEndpoint1 start) Tj
+/F1 10 Tf
+1 0 0 1 54 183.00 Tm
+(request. The evidence now points away from raw mailbox values and toward the) Tj
+/F1 10 Tf
+1 0 0 1 54 170.00 Tm
+(higher-level buffer transaction format.) Tj
+/F1 10 Tf
+1 0 0 1 54 152.00 Tm
+(Capture:) Tj
+/F3 8 Tf
+1 0 0 1 54 130.00 Tm
+(artifacts/oldrtbuddy-packet-addr-candidates-2026-05-20-153508.txt) Tj
+ET
+endstream
+endobj
+43 0 obj
+<< /Type /Page /Parent 44 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 42 0 R >>
+endobj
+44 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R] /Count 20 >>
+endobj
+45 0 obj
+<< /Type /Catalog /Pages 44 0 R >>
+endobj
+46 0 obj
+<< /Title (A8 STORAGE FINDINGS) /Producer (iphone6plus-android-port render_markdown_pdf.py) >>
 endobj
 xref
-0 31
+0 47
 0000000000 65535 f 
-0000000061 00000 n 
-0000000122 00000 n 
-0000000229 00000 n 
-0000000341 00000 n 
-0000000446 00000 n 
-0000000529 00000 n 
-0000000724 00000 n 
-0000000919 00000 n 
-0000001114 00000 n 
-0000001309 00000 n 
-0000001505 00000 n 
-0000001701 00000 n 
-0000001897 00000 n 
-0000002093 00000 n 
-0000002289 00000 n 
-0000002485 00000 n 
-0000002681 00000 n 
-0000002751 00000 n 
-0000003030 00000 n 
-0000003161 00000 n 
-0000004842 00000 n 
-0000006765 00000 n 
-0000008261 00000 n 
-0000010278 00000 n 
-0000012130 00000 n 
-0000013753 00000 n 
-0000015657 00000 n 
-0000017504 00000 n 
-0000019357 00000 n 
-0000021084 00000 n 
-trailer
-<<
-/ID 
-[<d6941fec3cb3dc09492a41a8a320fac3><d6941fec3cb3dc09492a41a8a320fac3>]
-% ReportLab generated PDF document -- digest (opensource)
-
-/Info 18 0 R
-/Root 17 0 R
-/Size 31
->>
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000228 00000 n 
+0000003563 00000 n 
+0000003710 00000 n 
+0000007241 00000 n 
+0000007388 00000 n 
+0000011173 00000 n 
+0000011320 00000 n 
+0000015044 00000 n 
+0000015193 00000 n 
+0000018749 00000 n 
+0000018898 00000 n 
+0000022097 00000 n 
+0000022246 00000 n 
+0000025807 00000 n 
+0000025956 00000 n 
+0000029715 00000 n 
+0000029864 00000 n 
+0000033323 00000 n 
+0000033472 00000 n 
+0000037019 00000 n 
+0000037168 00000 n 
+0000040583 00000 n 
+0000040732 00000 n 
+0000043882 00000 n 
+0000044031 00000 n 
+0000047462 00000 n 
+0000047611 00000 n 
+0000051015 00000 n 
+0000051164 00000 n 
+0000054534 00000 n 
+0000054683 00000 n 
+0000058199 00000 n 
+0000058348 00000 n 
+0000062088 00000 n 
+0000062237 00000 n 
+0000065687 00000 n 
+0000065836 00000 n 
+0000069356 00000 n 
+0000069505 00000 n 
+0000073030 00000 n 
+0000073179 00000 n 
+0000073369 00000 n 
+0000073420 00000 n 
+trailer << /Size 47 /Root 45 0 R /Info 46 0 R >>
 startxref
-22907
+73531
 %%EOF

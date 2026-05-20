@@ -1,6 +1,6 @@
 # iPhone 6 Plus Android Bring-up Report
 
-Date: May 18, 2026
+Date: May 20, 2026
 
 Device: iPhone 6 Plus, iPhone7,1 / N56AP / Apple A8 T7000, iOS 12.5.8
 
@@ -35,11 +35,12 @@ ASC/RTKit mailbox path for ANS. It uses the older AKF mailbox path at ANS base
 plus `0x1000`. After adding AKF mailbox diagnostics, the phone returned real
 ANS/RTBuddy management messages.
 
-The latest confirmed phone-side milestone is that Linux now has an ordered,
-state-machine-gated reply path for that old RTBuddy management loop. The new
-driver path does not blindly write guessed values; it first confirms the full
-four-message loop is stable, confirms no unknown management messages are
-present, and only then allows a reply for the exact current phase.
+The latest confirmed phone-side milestone is that Linux can stage the recovered
+old RTBuddy packet shapes from iOS 12.5.8 and run guarded packet-address
+candidate tests against the live controller. Those tests did not expose NAND,
+but they ruled out another major wrong path: the missing transaction is not a
+plain physical address, shifted address, or simple address/length pair sent
+through the AKF mailbox.
 
 ## What We Accomplished
 
@@ -120,6 +121,26 @@ present, and only then allows a reply for the exact current phase.
 13. Booted the ordered-reply build on the phone and confirmed the new path is
     live.
 
+14. Recovered two old RTBuddy packet layouts from the iOS 12.5.8
+    `RTBuddyManagementEndpoint` code path:
+
+   - `old-small`: prefix `0400000054000000`, `word0=0x6`,
+     `word1=0x11`, total length `0x54`
+   - `old-0x40`: prefix `0400000054000000`, `word0=0x7`,
+     `word1=0x44`, total length `0x120`
+
+15. Added guarded packet staging and packet-address candidate sysfs paths:
+
+   - `oldrtbuddy_packet_model`
+   - `oldrtbuddy_packet_stage`
+   - `oldrtbuddy_packet_dump`
+   - `oldrtbuddy_packet_addr_plan`
+   - `oldrtbuddy_packet_addr_send`
+
+16. Booted kernel `#17` on the phone and tested packet-address candidates in
+    one pass. The controller stayed alive and stable, but did not advance to
+    endpoint discovery or NAND block-device registration.
+
 ## Important Phone-side Evidence
 
 The AKF mailbox exposed live values:
@@ -172,6 +193,24 @@ controlled protocol experiment. The driver can now refuse to send a reply if
 the ANS controller is not at the matching phase of the old RTBuddy management
 loop.
 
+The later packet-address candidate run tested whether old RTBuddy simply wanted
+the staged packet buffer address through the mailbox. The tested messages were:
+
+```text
+old-small addr64          -> 000000080543a000
+old-0x40 addr64           -> 000000080543a000
+old-0x40 addr-shift4      -> 0000000080543a00
+old-0x40 addr-shift12     -> 000000000080543a
+old-0x40 addr-len         -> 000001200543a000
+old-0x40 len-addr         -> 0543a00000000120
+```
+
+All writes returned success from the guarded Linux path, but the controller
+remained in the stable management loop. The safest interpretation is that the
+traffic reached the right layer but was incomplete, malformed, structurally
+insufficient, or unrelated to the expected transaction flow. It was not fatal;
+it was just not valid enough to advance.
+
 The current Linux partition list is still:
 
 ```text
@@ -218,6 +257,35 @@ ANS MMIO
 
 Until that exists, Android images, GSIs, APFS support, and ext4 filesystems do
 not solve the storage problem. They come after the block device exists.
+
+## Hardware / Schematic Note
+
+The iPhone 6 Plus schematic identifies the NAND package as `U0604`, with Apple
+part variants for 16 GB, 64 GB, and 128 GB NAND from vendors such as Hynix and
+Toshiba. The relevant signal names include:
+
+```text
+AP_BI_NAND_ANC0_IO<0..7>
+AP_BI_NAND_ANC1_IO<0..7>
+AP_TO_NAND_ANC0_CLE
+AP_TO_NAND_ANC0_ALE
+AP_TO_NAND_ANC0_WE_L
+AP_TO_NAND_ANC0_RE_L
+NAND_TO_PP_RB
+PP3V0_NAND
+PP1V2_NAND_VDDI
+```
+
+That supports the current software finding: the raw NAND package is not the
+main blocker. The package sits behind Apple’s A8-era NAND/ANS/ASP controller
+path. Replacing or blanking the NAND would not automatically make Linux see
+storage unless Linux can speak the old RTBuddy / ANS / ASPStorage protocol.
+
+The A8 family comparison is useful too. The Apple A8/T7000 was used across
+iPhone 6, iPhone 6 Plus, iPad mini 4, Apple TV HD, HomePod, and iPod touch 6,
+and iPad mini 4 teardown material also shows an A8 plus external NAND package.
+So the physical architecture is plausible for Linux/Android, but the custom
+Apple controller stack is still the real engineering boundary.
 
 ## About The NAND Theory
 

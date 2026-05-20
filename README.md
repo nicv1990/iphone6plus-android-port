@@ -23,12 +23,21 @@ Confirmed on real iPhone 6 Plus hardware:
 ```
 
 - A guarded ordered-reply path now exists in the diagnostic driver.
-- The latest phone-side result showed:
+- Recovered old RTBuddy packet shapes from iOS 12.5.8 are now staged in Linux:
 
 ```text
-oldrtbuddy_ordered_reply=v1
-stable=1 samples=64 unknown=0 phase=stable-management-loop
-last_msg=0070000000000001 loop_count=7 seen_mask=f
+old-small: prefix=0400000054000000 word0=0x6 word1=0x11 total_len=0x54
+old-0x40: prefix=0400000054000000 word0=0x7 word1=0x44 total_len=0x120
+```
+
+- A guarded packet-address candidate path was tested on real hardware.
+- The latest phone-side result showed the controller remained stable after
+  packet-address candidates, but storage still did not appear:
+
+```text
+oldrtbuddy_state=v1
+samples=64 unknown=0 phase=stable-management-loop last_msg=0070000000000001
+seen: state12=1 state04=1 ap_power10=1 iop_ack01=1 mask=f
 ```
 
 Storage is still not visible as the real internal NAND. Linux currently sees only RAM disks plus tiny MTD boot artifacts:
@@ -45,11 +54,19 @@ Those MTD devices are not the 128 GB NAND.
 
 The next engineering target is old A8 RTBuddy / ANS protocol bring-up:
 
-1. Decode the A8 RTBuddy management messages above.
-2. Determine the correct acknowledgement / state transition sequence.
+1. Reconstruct the old RTBuddy shared-buffer transaction layout.
+2. Identify packet header, descriptor, sequence/status, callback/context, and ownership fields.
 3. Reach the endpoint map and start `ANSEndpoint1`.
 4. Implement enough `ASPStorage` / `ASPBlockStorage` to register a read-only Linux block device.
 5. Only after that, try Android userspace or an Android system image.
+
+The packet-address run ruled out a simple physical-address handoff through the
+mailbox. The controller tolerated the traffic and stayed in the management
+loop, but it did not semantically accept it as a complete transaction.
+
+The iPhone 6 Plus schematic also supports this direction: NAND is a physical
+package (`U0604`) behind Apple’s A8-era NAND/ANS/ASP controller path. The
+blocker is the controller protocol, not merely the NAND chip package.
 
 The patch in `patches/0001-t7000-ans-akf-oldrtbuddy-diagnostics.patch` adds the current Linux diagnostic driver and T7000 device-tree hook.
 
@@ -67,4 +84,3 @@ The patch in `patches/0001-t7000-ans-akf-oldrtbuddy-diagnostics.patch` adds the 
 This is not a claim that Android already fully runs on the iPhone 6 Plus.
 
 The phone can boot Linux code, but internal storage still requires driver work. Android comes later, after Linux can expose the Apple NAND through the A8 ANS / RTBuddy / ASPStorage stack.
-

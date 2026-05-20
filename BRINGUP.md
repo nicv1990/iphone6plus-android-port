@@ -18,6 +18,13 @@ The practical boot chain is:
 - Hoolock docs list A8 USB2 device mode support in `linux-apple`.
 - The Hoolock and pmaports kernel configs enable Android binder IPC with `binder,hwbinder,vndbinder`.
 - The configs also enable `CONFIG_MEMFD_CREATE`, which modern Android userspace expects.
+- The current storage blocker is not Android userspace or APFS. Linux reaches
+  the A8 ANS / old RTBuddy management loop, but does not yet implement the
+  shared-buffer transaction path needed to start `ANSEndpoint1` and expose
+  ASPStorage as a Linux block device.
+- Packet-address candidates were tested on real iPhone 6 Plus hardware. The
+  controller stayed stable, but did not advance, so the missing piece is not a
+  plain physical address or address/length mailbox payload.
 - GPU is still listed as TBA for A8. The Hoolock kernel tree contains the upstream Imagination/PowerVR Rogue DRM driver, but A8 configs currently leave `CONFIG_DRM_POWERVR` disabled and the T7000 DTS files do not declare a GPU node yet.
 - The T7000 PMGR device tree does include a `ps_gfx` power domain, which is one necessary piece for a GPU node.
 - pmaports already has an iPhone 6 package. This workspace adds a local iPhone 6 Plus package in `device/testing/device-apple-iphone6plus`.

@@ -1,187 +1,864 @@
 %PDF-1.4
-%“Œ‹ž ReportLab Generated PDF document (opensource)
+%âãÏÓ
 1 0 obj
-<<
-/F1 2 0 R /F2 3 0 R /F3 4 0 R /F4 5 0 R /F5 6 0 R
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 2 0 obj
-<<
-/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
 endobj
 3 0 obj
-<<
-/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
 endobj
 4 0 obj
-<<
-/BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
->>
+<< /Length 3796 >>
+stream
+BT
+/F2 18 Tf
+1 0 0 1 54 732.00 Tm
+(iPhone 6 Plus Android Bring-up Report) Tj
+/F1 10 Tf
+1 0 0 1 54 701.00 Tm
+(Date: May 20, 2026) Tj
+/F1 10 Tf
+1 0 0 1 54 683.00 Tm
+(Device: iPhone 6 Plus, iPhone7,1 / N56AP / Apple A8 T7000, iOS 12.5.8) Tj
+/F2 14 Tf
+1 0 0 1 54 657.00 Tm
+(Goal) Tj
+/F1 10 Tf
+1 0 0 1 54 631.00 Tm
+(The goal is to get a real Android/Linux-based system running on the iPhone 6) Tj
+/F1 10 Tf
+1 0 0 1 54 618.00 Tm
+(Plus, not just to boot a diagnostic shell. A Pixel-style Android userspace or) Tj
+/F1 10 Tf
+1 0 0 1 54 605.00 Tm
+(Android GSI is only useful after the Linux kernel can see the phone hardware,) Tj
+/F1 10 Tf
+1 0 0 1 54 592.00 Tm
+(especially display, USB, input, and internal storage.) Tj
+/F2 14 Tf
+1 0 0 1 54 566.00 Tm
+(Short Summary) Tj
+/F1 10 Tf
+1 0 0 1 54 540.00 Tm
+(We successfully booted custom Linux payloads on the iPhone 6 Plus through) Tj
+/F1 10 Tf
+1 0 0 1 54 527.00 Tm
+(DFU, PongoOS, m1n1, and Hoolock Linux. The phone can run Linux code and expose) Tj
+/F1 10 Tf
+1 0 0 1 54 514.00 Tm
+(a USB shell. We added a device-tree node and a Linux diagnostic driver for the) Tj
+/F1 10 Tf
+1 0 0 1 54 501.00 Tm
+(A8 ANS storage controller path, then tested it on the physical phone.) Tj
+/F1 10 Tf
+1 0 0 1 54 483.00 Tm
+(The big result is that Linux can power and talk to the ANS hardware region, but) Tj
+/F1 10 Tf
+1 0 0 1 54 470.00 Tm
+(the internal NAND does not appear as a block device yet. This is not because) Tj
+/F1 10 Tf
+1 0 0 1 54 457.00 Tm
+(Android is the wrong image and not because APFS is unreadable. Linux currently) Tj
+/F1 10 Tf
+1 0 0 1 54 444.00 Tm
+(lacks the A8-era Apple ANS / RTBuddy / ASP storage driver needed to turn the) Tj
+/F1 10 Tf
+1 0 0 1 54 431.00 Tm
+(iPhone NAND into something like /dev/sda, /dev/mmcblk0, or an Apple NAND) Tj
+/F1 10 Tf
+1 0 0 1 54 418.00 Tm
+(block device.) Tj
+/F1 10 Tf
+1 0 0 1 54 400.00 Tm
+(In plain terms: the phone is telling us the blocker is the Apple storage) Tj
+/F1 10 Tf
+1 0 0 1 54 387.00 Tm
+(controller protocol, not the physical NAND package. iOS has an) Tj
+/F1 10 Tf
+1 0 0 1 54 374.00 Tm
+(ANS/RTBuddy/ASP storage stack, and Linux does not yet have the A8 driver for) Tj
+/F1 10 Tf
+1 0 0 1 54 361.00 Tm
+(that path.) Tj
+/F1 10 Tf
+1 0 0 1 54 343.00 Tm
+(The most useful breakthrough was discovering that A8 does not use the newer) Tj
+/F1 10 Tf
+1 0 0 1 54 330.00 Tm
+(ASC/RTKit mailbox path for ANS. It uses the older AKF mailbox path at ANS base) Tj
+/F1 10 Tf
+1 0 0 1 54 317.00 Tm
+(plus 0x1000. After adding AKF mailbox diagnostics, the phone returned real) Tj
+/F1 10 Tf
+1 0 0 1 54 304.00 Tm
+(ANS/RTBuddy management messages.) Tj
+/F1 10 Tf
+1 0 0 1 54 286.00 Tm
+(The latest confirmed phone-side milestone is that Linux can stage the recovered) Tj
+/F1 10 Tf
+1 0 0 1 54 273.00 Tm
+(old RTBuddy packet shapes from iOS 12.5.8 and run guarded packet-address) Tj
+/F1 10 Tf
+1 0 0 1 54 260.00 Tm
+(candidate tests against the live controller. Those tests did not expose NAND,) Tj
+/F1 10 Tf
+1 0 0 1 54 247.00 Tm
+(but they ruled out another major wrong path: the missing transaction is not a) Tj
+/F1 10 Tf
+1 0 0 1 54 234.00 Tm
+(plain physical address, shifted address, or simple address/length pair sent) Tj
+/F1 10 Tf
+1 0 0 1 54 221.00 Tm
+(through the AKF mailbox.) Tj
+/F2 14 Tf
+1 0 0 1 54 195.00 Tm
+(What We Accomplished) Tj
+/F1 10 Tf
+1 0 0 1 54 169.00 Tm
+(1. Booted custom Linux on the iPhone 6 Plus through DFU and PongoOS.) Tj
+/F1 10 Tf
+1 0 0 1 54 151.00 Tm
+(2. Confirmed the device identity from Linux:) Tj
+/F1 10 Tf
+1 0 0 1 54 133.00 Tm
+(     - Apple iPhone 6 Plus) Tj
+/F1 10 Tf
+1 0 0 1 54 120.00 Tm
+(     - apple,n56) Tj
+/F1 10 Tf
+1 0 0 1 54 107.00 Tm
+(     - apple,t7000) Tj
+/F1 10 Tf
+1 0 0 1 54 94.00 Tm
+(     - Apple A8 / T7000) Tj
+/F1 10 Tf
+1 0 0 1 54 76.00 Tm
+(3. Confirmed the iOS SSH ramdisk can see the internal storage:) Tj
+ET
+endstream
 endobj
 5 0 obj
-<<
-/BaseFont /Courier /Encoding /WinAnsiEncoding /Name /F4 /Subtype /Type1 /Type /Font
->>
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 4 0 R >>
 endobj
 6 0 obj
-<<
-/BaseFont /ZapfDingbats /Name /F5 /Subtype /Type1 /Type /Font
->>
+<< /Length 3456 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(     - ASPStorage) Tj
+/F1 10 Tf
+1 0 0 1 54 725.00 Tm
+(     - ASPBlockStorage) Tj
+/F1 10 Tf
+1 0 0 1 54 712.00 Tm
+(     - IONANDBlockDevice) Tj
+/F1 10 Tf
+1 0 0 1 54 699.00 Tm
+(     - Apple NAND Media) Tj
+/F1 10 Tf
+1 0 0 1 54 686.00 Tm
+(     - disk0) Tj
+/F1 10 Tf
+1 0 0 1 54 673.00 Tm
+(     - 128 GB Toshiba NAND) Tj
+/F1 10 Tf
+1 0 0 1 54 660.00 Tm
+(     - 4096-byte block size) Tj
+/F1 10 Tf
+1 0 0 1 54 647.00 Tm
+(     - valid GPT protective MBR ending in 55 aa) Tj
+/F1 10 Tf
+1 0 0 1 54 629.00 Tm
+(4. Confirmed Hoolock Linux does not see internal storage yet:) Tj
+/F1 10 Tf
+1 0 0 1 54 611.00 Tm
+(     - Linux sees RAM disks.) Tj
+/F1 10 Tf
+1 0 0 1 54 598.00 Tm
+(     - Linux sees small MTD entries for boot artifacts.) Tj
+/F1 10 Tf
+1 0 0 1 54 585.00 Tm
+(     - Linux does not expose the internal iPhone NAND as a usable block device.) Tj
+/F1 10 Tf
+1 0 0 1 54 567.00 Tm
+(5. Added the A8 ANS node to the T7000 device tree:) Tj
+/F1 10 Tf
+1 0 0 1 54 549.00 Tm
+(     - physical address 0x208040000) Tj
+/F1 10 Tf
+1 0 0 1 54 536.00 Tm
+(     - length 0x2000) Tj
+/F1 10 Tf
+1 0 0 1 54 523.00 Tm
+(     - power domain ps_ans) Tj
+/F1 10 Tf
+1 0 0 1 54 510.00 Tm
+(     - interrupts matching the iOS ADT data) Tj
+/F1 10 Tf
+1 0 0 1 54 492.00 Tm
+(6. Added a Linux diagnostic driver:) Tj
+/F1 10 Tf
+1 0 0 1 54 474.00 Tm
+(     - drivers/soc/apple/t7000-ans-probe.c) Tj
+/F1 10 Tf
+1 0 0 1 54 461.00 Tm
+(     - bound to /soc/ans@208040000) Tj
+/F1 10 Tf
+1 0 0 1 54 448.00 Tm
+(     - exposes ANS registers through sysfs) Tj
+/F1 10 Tf
+1 0 0 1 54 435.00 Tm
+(     - exposes ASC and AKF mailbox diagnostics) Tj
+/F1 10 Tf
+1 0 0 1 54 417.00 Tm
+(7. Proved Linux can power and map the ANS MMIO region:) Tj
+/F1 10 Tf
+1 0 0 1 54 399.00 Tm
+(   `text) Tj
+/F1 10 Tf
+1 0 0 1 54 386.00 Tm
+(   mmio_size=0x2000 pm_ret=0 runtime_status=active) Tj
+/F1 10 Tf
+1 0 0 1 54 373.00 Tm
+(   `) Tj
+/F1 10 Tf
+1 0 0 1 54 355.00 Tm
+(8. Tested the newer ASC/RTKit-style mailbox path.) Tj
+/F1 10 Tf
+1 0 0 1 54 337.00 Tm
+(   Result: it did not produce a HELLO on A8. The CPU start bit did not behave) Tj
+/F1 10 Tf
+1 0 0 1 54 324.00 Tm
+(   like newer Apple Silicon ANS controllers.) Tj
+/F1 10 Tf
+1 0 0 1 54 306.00 Tm
+(9. Found the correct A8-era mailbox family in local m1n1 source:) Tj
+/F1 10 Tf
+1 0 0 1 54 288.00 Tm
+(     - hoolock-m1n1/src/akf.c) Tj
+/F1 10 Tf
+1 0 0 1 54 275.00 Tm
+(     - iop,s5l8960x uses AKF) Tj
+/F1 10 Tf
+1 0 0 1 54 262.00 Tm
+(     - AKF mailbox base is ANS base plus 0x1000) Tj
+/F1 10 Tf
+1 0 0 1 54 249.00 Tm
+(     - messages are split into 32-bit halves) Tj
+/F1 10 Tf
+1 0 0 1 54 231.00 Tm
+(10. Tested AKF on the real phone and got live ANS/RTBuddy traffic.) Tj
+/F1 10 Tf
+1 0 0 1 54 213.00 Tm
+(11. Added an old RTBuddy state-machine view:) Tj
+/F1 10 Tf
+1 0 0 1 54 195.00 Tm
+(     - oldrtbuddy_state) Tj
+/F1 10 Tf
+1 0 0 1 54 182.00 Tm
+(     - tracks the four observed management phases) Tj
+/F1 10 Tf
+1 0 0 1 54 169.00 Tm
+(     - confirms the loop is stable) Tj
+/F1 10 Tf
+1 0 0 1 54 156.00 Tm
+(     - records the last message and mailbox control bits) Tj
+/F1 10 Tf
+1 0 0 1 54 138.00 Tm
+(12. Added an ordered reply path:) Tj
+/F1 10 Tf
+1 0 0 1 54 120.00 Tm
+(     - oldrtbuddy_plan) Tj
+/F1 10 Tf
+1 0 0 1 54 107.00 Tm
+(     - oldrtbuddy_ordered_reply) Tj
+/F1 10 Tf
+1 0 0 1 54 94.00 Tm
+(     - refuses to send unless the controller is in the expected phase) Tj
+/F1 10 Tf
+1 0 0 1 54 81.00 Tm
+(     - intended for controlled ANS/RTBuddy acknowledgement experiments) Tj
+ET
+endstream
 endobj
 7 0 obj
-<<
-/Contents 16 0 R /MediaBox [ 0 0 612 792 ] /Parent 15 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 6 0 R >>
 endobj
 8 0 obj
-<<
-/Contents 17 0 R /MediaBox [ 0 0 612 792 ] /Parent 15 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3626 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(13. Booted the ordered-reply build on the phone and confirmed the new path is) Tj
+/F1 10 Tf
+1 0 0 1 54 725.00 Tm
+(    live.) Tj
+/F1 10 Tf
+1 0 0 1 54 707.00 Tm
+(14. Recovered two old RTBuddy packet layouts from the iOS 12.5.8) Tj
+/F1 10 Tf
+1 0 0 1 54 694.00 Tm
+(    RTBuddyManagementEndpoint code path:) Tj
+/F1 10 Tf
+1 0 0 1 54 676.00 Tm
+(     - old-small: prefix 0400000054000000, word0=0x6,) Tj
+/F1 10 Tf
+1 0 0 1 54 663.00 Tm
+(     word1=0x11, total length 0x54) Tj
+/F1 10 Tf
+1 0 0 1 54 650.00 Tm
+(     - old-0x40: prefix 0400000054000000, word0=0x7,) Tj
+/F1 10 Tf
+1 0 0 1 54 637.00 Tm
+(     word1=0x44, total length 0x120) Tj
+/F1 10 Tf
+1 0 0 1 54 619.00 Tm
+(15. Added guarded packet staging and packet-address candidate sysfs paths:) Tj
+/F1 10 Tf
+1 0 0 1 54 601.00 Tm
+(     - oldrtbuddy_packet_model) Tj
+/F1 10 Tf
+1 0 0 1 54 588.00 Tm
+(     - oldrtbuddy_packet_stage) Tj
+/F1 10 Tf
+1 0 0 1 54 575.00 Tm
+(     - oldrtbuddy_packet_dump) Tj
+/F1 10 Tf
+1 0 0 1 54 562.00 Tm
+(     - oldrtbuddy_packet_addr_plan) Tj
+/F1 10 Tf
+1 0 0 1 54 549.00 Tm
+(     - oldrtbuddy_packet_addr_send) Tj
+/F1 10 Tf
+1 0 0 1 54 531.00 Tm
+(16. Booted kernel #17 on the phone and tested packet-address candidates in) Tj
+/F1 10 Tf
+1 0 0 1 54 518.00 Tm
+(    one pass. The controller stayed alive and stable, but did not advance to) Tj
+/F1 10 Tf
+1 0 0 1 54 505.00 Tm
+(    endpoint discovery or NAND block-device registration.) Tj
+/F2 14 Tf
+1 0 0 1 54 479.00 Tm
+(Important Phone-side Evidence) Tj
+/F1 10 Tf
+1 0 0 1 54 453.00 Tm
+(The AKF mailbox exposed live values:) Tj
+/F3 8 Tf
+1 0 0 1 54 431.00 Tm
+(akf_set          @1000: 00001111) Tj
+/F3 8 Tf
+1 0 0 1 54 420.00 Tm
+(akf_clr          @1004: 00001111) Tj
+/F3 8 Tf
+1 0 0 1 54 409.00 Tm
+(akf_a2i_control  @1008: 00023301) Tj
+/F3 8 Tf
+1 0 0 1 54 398.00 Tm
+(akf_a2i_send0    @1010: 00000001) Tj
+/F3 8 Tf
+1 0 0 1 54 387.00 Tm
+(akf_a2i_send1    @1014: 00600000) Tj
+/F3 8 Tf
+1 0 0 1 54 376.00 Tm
+(akf_a2i_recv0    @1018: 000ff013) Tj
+/F3 8 Tf
+1 0 0 1 54 365.00 Tm
+(akf_a2i_recv1    @101c: 06000000) Tj
+/F3 8 Tf
+1 0 0 1 54 354.00 Tm
+(akf_i2a_control  @1020: 00020001) Tj
+/F3 8 Tf
+1 0 0 1 54 343.00 Tm
+(akf_i2a_recv0    @1038: 00000012) Tj
+/F3 8 Tf
+1 0 0 1 54 332.00 Tm
+(akf_i2a_recv1    @103c: 06000000) Tj
+/F1 10 Tf
+1 0 0 1 54 312.00 Tm
+(Polling the AKF receive side produced a repeating management sequence:) Tj
+/F3 8 Tf
+1 0 0 1 54 290.00 Tm
+(0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 279.00 Tm
+(0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 268.00 Tm
+(00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 257.00 Tm
+(0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 237.00 Tm
+(That means the ANS storage controller is not dead and not invisible. Linux is) Tj
+/F1 10 Tf
+1 0 0 1 54 224.00 Tm
+(now reaching the correct mailbox family. The remaining task is to decode and) Tj
+/F1 10 Tf
+1 0 0 1 54 211.00 Tm
+(respond to this older RTBuddy management sequence, then start ANSEndpoint1.) Tj
+/F1 10 Tf
+1 0 0 1 54 193.00 Tm
+(The ordered state-machine path was later confirmed on the phone:) Tj
+/F3 8 Tf
+1 0 0 1 54 171.00 Tm
+(oldrtbuddy_ordered_reply=v1) Tj
+/F3 8 Tf
+1 0 0 1 54 160.00 Tm
+(stable=1 samples=64 unknown=0 phase=stable-management-loop) Tj
+/F3 8 Tf
+1 0 0 1 54 149.00 Tm
+(last_msg=0070000000000001 loop_count=7 seen_mask=f) Tj
+/F1 10 Tf
+1 0 0 1 54 129.00 Tm
+(The driver also confirmed the four expected phases:) Tj
+/F3 8 Tf
+1 0 0 1 54 107.00 Tm
+(state12     expects 0600000000000012) Tj
+/F3 8 Tf
+1 0 0 1 54 96.00 Tm
+(state04     expects 0600000000000004) Tj
+/F3 8 Tf
+1 0 0 1 54 85.00 Tm
+(ap_power10  expects 00b0000000000010) Tj
+/F3 8 Tf
+1 0 0 1 54 74.00 Tm
+(iop_ack01   expects 0070000000000001) Tj
+ET
+endstream
 endobj
 9 0 obj
-<<
-/Contents 18 0 R /MediaBox [ 0 0 612 792 ] /Parent 15 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 8 0 R >>
 endobj
 10 0 obj
-<<
-/Contents 19 0 R /MediaBox [ 0 0 612 792 ] /Parent 15 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 3815 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(This is important because it moves the work from one-off guessed writes to a) Tj
+/F1 10 Tf
+1 0 0 1 54 725.00 Tm
+(controlled protocol experiment. The driver can now refuse to send a reply if) Tj
+/F1 10 Tf
+1 0 0 1 54 712.00 Tm
+(the ANS controller is not at the matching phase of the old RTBuddy management) Tj
+/F1 10 Tf
+1 0 0 1 54 699.00 Tm
+(loop.) Tj
+/F1 10 Tf
+1 0 0 1 54 681.00 Tm
+(The later packet-address candidate run tested whether old RTBuddy simply wanted) Tj
+/F1 10 Tf
+1 0 0 1 54 668.00 Tm
+(the staged packet buffer address through the mailbox. The tested messages were:) Tj
+/F3 8 Tf
+1 0 0 1 54 646.00 Tm
+(old-small addr64          -> 000000080543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 635.00 Tm
+(old-0x40 addr64           -> 000000080543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 624.00 Tm
+(old-0x40 addr-shift4      -> 0000000080543a00) Tj
+/F3 8 Tf
+1 0 0 1 54 613.00 Tm
+(old-0x40 addr-shift12     -> 000000000080543a) Tj
+/F3 8 Tf
+1 0 0 1 54 602.00 Tm
+(old-0x40 addr-len         -> 000001200543a000) Tj
+/F3 8 Tf
+1 0 0 1 54 591.00 Tm
+(old-0x40 len-addr         -> 0543a00000000120) Tj
+/F1 10 Tf
+1 0 0 1 54 571.00 Tm
+(All writes returned success from the guarded Linux path, but the controller) Tj
+/F1 10 Tf
+1 0 0 1 54 558.00 Tm
+(remained in the stable management loop. The safest interpretation is that the) Tj
+/F1 10 Tf
+1 0 0 1 54 545.00 Tm
+(traffic reached the right layer but was incomplete, malformed, structurally) Tj
+/F1 10 Tf
+1 0 0 1 54 532.00 Tm
+(insufficient, or unrelated to the expected transaction flow. It was not fatal;) Tj
+/F1 10 Tf
+1 0 0 1 54 519.00 Tm
+(it was just not valid enough to advance.) Tj
+/F1 10 Tf
+1 0 0 1 54 501.00 Tm
+(The current Linux partition list is still:) Tj
+/F3 8 Tf
+1 0 0 1 54 479.00 Tm
+(ram0..ram15) Tj
+/F3 8 Tf
+1 0 0 1 54 468.00 Tm
+(mtdblock0) Tj
+/F3 8 Tf
+1 0 0 1 54 457.00 Tm
+(mtdblock1) Tj
+/F1 10 Tf
+1 0 0 1 54 437.00 Tm
+(The tiny MTD devices are not the internal NAND. They are only 16 KB and 128 KB,) Tj
+/F1 10 Tf
+1 0 0 1 54 424.00 Tm
+(which matches boot/test artifacts such as logs or the device tree. The iPhone) Tj
+/F1 10 Tf
+1 0 0 1 54 411.00 Tm
+(NAND is about 128 GB, so it would appear as a much larger block device after) Tj
+/F1 10 Tf
+1 0 0 1 54 398.00 Tm
+(the ANS/RTBuddy/ASP stack is initialized.) Tj
+/F2 14 Tf
+1 0 0 1 54 372.00 Tm
+(Why Android Still Does Not Boot) Tj
+/F1 10 Tf
+1 0 0 1 54 346.00 Tm
+(Android needs a Linux kernel with drivers for the hardware it is running on.) Tj
+/F1 10 Tf
+1 0 0 1 54 333.00 Tm
+(Right now, the kernel can boot, display logs, and provide a USB shell, but it) Tj
+/F1 10 Tf
+1 0 0 1 54 320.00 Tm
+(cannot mount or install to the internal iPhone storage because the internal) Tj
+/F1 10 Tf
+1 0 0 1 54 307.00 Tm
+(storage block device is not registered.) Tj
+/F1 10 Tf
+1 0 0 1 54 289.00 Tm
+(The storage path on iOS is:) Tj
+/F3 8 Tf
+1 0 0 1 54 267.00 Tm
+(ans@8040000) Tj
+/F3 8 Tf
+1 0 0 1 54 256.00 Tm
+(  iop-ans-nub) Tj
+/F3 8 Tf
+1 0 0 1 54 245.00 Tm
+(    RTBuddy) Tj
+/F3 8 Tf
+1 0 0 1 54 234.00 Tm
+(      ANSEndpoint1) Tj
+/F3 8 Tf
+1 0 0 1 54 223.00 Tm
+(        ASPStorage) Tj
+/F3 8 Tf
+1 0 0 1 54 212.00 Tm
+(          ASPBlockStorage) Tj
+/F3 8 Tf
+1 0 0 1 54 201.00 Tm
+(            IONANDBlockDevice) Tj
+/F3 8 Tf
+1 0 0 1 54 190.00 Tm
+(              Apple NAND Media -> disk0) Tj
+/F1 10 Tf
+1 0 0 1 54 170.00 Tm
+(Linux needs an equivalent path:) Tj
+/F3 8 Tf
+1 0 0 1 54 148.00 Tm
+(ANS MMIO) Tj
+/F3 8 Tf
+1 0 0 1 54 137.00 Tm
+(  AKF mailbox) Tj
+/F3 8 Tf
+1 0 0 1 54 126.00 Tm
+(    old RTBuddy management protocol) Tj
+/F3 8 Tf
+1 0 0 1 54 115.00 Tm
+(      ANSEndpoint1) Tj
+/F3 8 Tf
+1 0 0 1 54 104.00 Tm
+(        ASPStorage / ASPBlockStorage commands) Tj
+/F3 8 Tf
+1 0 0 1 54 93.00 Tm
+(          Linux block device) Tj
+/F1 10 Tf
+1 0 0 1 54 73.00 Tm
+(Until that exists, Android images, GSIs, APFS support, and ext4 filesystems do) Tj
+ET
+endstream
 endobj
 11 0 obj
-<<
-/Contents 20 0 R /MediaBox [ 0 0 612 792 ] /Parent 15 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 10 0 R >>
 endobj
 12 0 obj
-<<
-/Contents 21 0 R /MediaBox [ 0 0 612 792 ] /Parent 15 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
->>
+<< /Length 4096 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(not solve the storage problem. They come after the block device exists.) Tj
+/F2 14 Tf
+1 0 0 1 54 712.00 Tm
+(Hardware / Schematic Note) Tj
+/F1 10 Tf
+1 0 0 1 54 686.00 Tm
+(The iPhone 6 Plus schematic identifies the NAND package as U0604, with Apple) Tj
+/F1 10 Tf
+1 0 0 1 54 673.00 Tm
+(part variants for 16 GB, 64 GB, and 128 GB NAND from vendors such as Hynix and) Tj
+/F1 10 Tf
+1 0 0 1 54 660.00 Tm
+(Toshiba. The relevant signal names include:) Tj
+/F3 8 Tf
+1 0 0 1 54 638.00 Tm
+(AP_BI_NAND_ANC0_IO<0..7>) Tj
+/F3 8 Tf
+1 0 0 1 54 627.00 Tm
+(AP_BI_NAND_ANC1_IO<0..7>) Tj
+/F3 8 Tf
+1 0 0 1 54 616.00 Tm
+(AP_TO_NAND_ANC0_CLE) Tj
+/F3 8 Tf
+1 0 0 1 54 605.00 Tm
+(AP_TO_NAND_ANC0_ALE) Tj
+/F3 8 Tf
+1 0 0 1 54 594.00 Tm
+(AP_TO_NAND_ANC0_WE_L) Tj
+/F3 8 Tf
+1 0 0 1 54 583.00 Tm
+(AP_TO_NAND_ANC0_RE_L) Tj
+/F3 8 Tf
+1 0 0 1 54 572.00 Tm
+(NAND_TO_PP_RB) Tj
+/F3 8 Tf
+1 0 0 1 54 561.00 Tm
+(PP3V0_NAND) Tj
+/F3 8 Tf
+1 0 0 1 54 550.00 Tm
+(PP1V2_NAND_VDDI) Tj
+/F1 10 Tf
+1 0 0 1 54 530.00 Tm
+(That supports the current software finding: the raw NAND package is not the) Tj
+/F1 10 Tf
+1 0 0 1 54 517.00 Tm
+(main blocker. The package sits behind Appleâ€™s A8-era NAND/ANS/ASP controller) Tj
+/F1 10 Tf
+1 0 0 1 54 504.00 Tm
+(path. Replacing or blanking the NAND would not automatically make Linux see) Tj
+/F1 10 Tf
+1 0 0 1 54 491.00 Tm
+(storage unless Linux can speak the old RTBuddy / ANS / ASPStorage protocol.) Tj
+/F1 10 Tf
+1 0 0 1 54 473.00 Tm
+(The A8 family comparison is useful too. The Apple A8/T7000 was used across) Tj
+/F1 10 Tf
+1 0 0 1 54 460.00 Tm
+(iPhone 6, iPhone 6 Plus, iPad mini 4, Apple TV HD, HomePod, and iPod touch 6,) Tj
+/F1 10 Tf
+1 0 0 1 54 447.00 Tm
+(and iPad mini 4 teardown material also shows an A8 plus external NAND package.) Tj
+/F1 10 Tf
+1 0 0 1 54 434.00 Tm
+(So the physical architecture is plausible for Linux/Android, but the custom) Tj
+/F1 10 Tf
+1 0 0 1 54 421.00 Tm
+(Apple controller stack is still the real engineering boundary.) Tj
+/F2 14 Tf
+1 0 0 1 54 395.00 Tm
+(About The NAND Theory) Tj
+/F1 10 Tf
+1 0 0 1 54 369.00 Tm
+(It is understandable to suspect the NAND chip because the failure looks like) Tj
+/F1 10 Tf
+1 0 0 1 54 356.00 Tm
+("Linux cannot see the storage." But the evidence so far does not show that the) Tj
+/F1 10 Tf
+1 0 0 1 54 343.00 Tm
+(physical NAND chip has a special block that prevents Android.) Tj
+/F1 10 Tf
+1 0 0 1 54 325.00 Tm
+(What the evidence shows:) Tj
+/F1 10 Tf
+1 0 0 1 54 307.00 Tm
+(  - iOS can see and read the NAND.) Tj
+/F1 10 Tf
+1 0 0 1 54 294.00 Tm
+(  - The iOS storage stack talks through Apple-specific layers: ANS, RTBuddy,) Tj
+/F1 10 Tf
+1 0 0 1 54 281.00 Tm
+(  ASPStorage, ASPBlockStorage, and IONANDBlockDevice.) Tj
+/F1 10 Tf
+1 0 0 1 54 268.00 Tm
+(  - Linux does not yet implement the A8 version of that stack.) Tj
+/F1 10 Tf
+1 0 0 1 54 255.00 Tm
+(  - Once we used the correct AKF mailbox family, ANS started returning real) Tj
+/F1 10 Tf
+1 0 0 1 54 242.00 Tm
+(  management messages.) Tj
+/F1 10 Tf
+1 0 0 1 54 224.00 Tm
+(So the phone is not showing us a dead, locked, or unusable NAND chip. It is) Tj
+/F1 10 Tf
+1 0 0 1 54 211.00 Tm
+(showing us a storage controller protocol gap: Apple already has the) Tj
+/F1 10 Tf
+1 0 0 1 54 198.00 Tm
+(ANS/RTBuddy/ASP stack in iOS, while Linux still needs an A8-compatible driver) Tj
+/F1 10 Tf
+1 0 0 1 54 185.00 Tm
+(for that path.) Tj
+/F1 10 Tf
+1 0 0 1 54 167.00 Tm
+(That points to a missing software driver/protocol implementation, not a NAND) Tj
+/F1 10 Tf
+1 0 0 1 54 154.00 Tm
+(chip that must be physically replaced.) Tj
+/F1 10 Tf
+1 0 0 1 54 136.00 Tm
+(Desoldering the NAND and installing a blank one would probably not make Android) Tj
+/F1 10 Tf
+1 0 0 1 54 123.00 Tm
+(installable by itself. The A8 SoC and boot chain would still need to initialize) Tj
+/F1 10 Tf
+1 0 0 1 54 110.00 Tm
+(ANS, speak RTBuddy, speak ASPStorage, and expose a block device. A blank NAND) Tj
+/F1 10 Tf
+1 0 0 1 54 97.00 Tm
+(could also create new boot, calibration, pairing, or restore problems.) Tj
+/F1 10 Tf
+1 0 0 1 54 79.00 Tm
+(A better next path is to continue implementing the ANS/RTBuddy/ASP driver. If) Tj
+ET
+endstream
 endobj
 13 0 obj
-<<
-/PageMode /UseNone /Pages 15 0 R /Type /Catalog
->>
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 12 0 R >>
 endobj
 14 0 obj
-<<
-/Author (Codex) /CreationDate (D:20260518224753-04'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260518224753-04'00') /Producer (ReportLab PDF Library - \(opensource\)) 
-  /Subject (\(unspecified\)) /Title (iPhone 6 Plus Android Bringup Report) /Trapped /False
->>
+<< /Length 2586 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 738.00 Tm
+(that driver eventually exposes the NAND as a Linux block device, then we can) Tj
+/F1 10 Tf
+1 0 0 1 54 725.00 Tm
+(decide whether to mount existing partitions read-only, create an Android data) Tj
+/F1 10 Tf
+1 0 0 1 54 712.00 Tm
+(area, or boot Android from external/ramdisk storage first.) Tj
+/F2 14 Tf
+1 0 0 1 54 686.00 Tm
+(What The Next Engineering Step Is) Tj
+/F1 10 Tf
+1 0 0 1 54 660.00 Tm
+(The next practical step is not another Android image test. It is implementing a) Tj
+/F1 10 Tf
+1 0 0 1 54 647.00 Tm
+(controlled AKF receive/respond path:) Tj
+/F1 10 Tf
+1 0 0 1 54 629.00 Tm
+(1. Decode the old A8 RTBuddy management messages:) Tj
+/F1 10 Tf
+1 0 0 1 54 611.00 Tm
+(   `text) Tj
+/F1 10 Tf
+1 0 0 1 54 598.00 Tm
+(   0600000000000012) Tj
+/F1 10 Tf
+1 0 0 1 54 585.00 Tm
+(   0600000000000004) Tj
+/F1 10 Tf
+1 0 0 1 54 572.00 Tm
+(   00b0000000000010) Tj
+/F1 10 Tf
+1 0 0 1 54 559.00 Tm
+(   0070000000000001) Tj
+/F1 10 Tf
+1 0 0 1 54 546.00 Tm
+(   `) Tj
+/F1 10 Tf
+1 0 0 1 54 528.00 Tm
+(2. Add safe code to acknowledge the messages instead of only polling them.) Tj
+/F1 10 Tf
+1 0 0 1 54 510.00 Tm
+(3. Use the new ordered-reply path to test a specific acknowledgement sequence) Tj
+/F1 10 Tf
+1 0 0 1 54 497.00 Tm
+(   only when the controller is at the matching phase.) Tj
+/F1 10 Tf
+1 0 0 1 54 479.00 Tm
+(4. Identify the endpoint map and find/start ANSEndpoint1.) Tj
+/F1 10 Tf
+1 0 0 1 54 461.00 Tm
+(5. Implement minimal ASPStorage / ASPBlockStorage commands.) Tj
+/F1 10 Tf
+1 0 0 1 54 443.00 Tm
+(6. Register a read-only Linux block device first.) Tj
+/F1 10 Tf
+1 0 0 1 54 425.00 Tm
+(7. Only after that, attempt Android userspace or an Android system image.) Tj
+/F2 14 Tf
+1 0 0 1 54 399.00 Tm
+(Current Status) Tj
+/F1 10 Tf
+1 0 0 1 54 373.00 Tm
+(We have moved from "the phone boots Linux but storage is missing" to "Linux can) Tj
+/F1 10 Tf
+1 0 0 1 54 360.00 Tm
+(talk to the correct A8 ANS mailbox, receive storage-controller management) Tj
+/F1 10 Tf
+1 0 0 1 54 347.00 Tm
+(messages, classify the stable old RTBuddy loop, and expose a guarded ordered) Tj
+/F1 10 Tf
+1 0 0 1 54 334.00 Tm
+(reply path." That is real progress toward Android, but the storage driver is) Tj
+/F1 10 Tf
+1 0 0 1 54 321.00 Tm
+(still incomplete.) Tj
+/F1 10 Tf
+1 0 0 1 54 303.00 Tm
+(The phone could plausibly run Android because the CPU is ARM64 and Linux already) Tj
+/F1 10 Tf
+1 0 0 1 54 290.00 Tm
+(boots. The blocker is Apple's custom hardware interface for storage and other) Tj
+/F1 10 Tf
+1 0 0 1 54 277.00 Tm
+(peripherals, not the basic ability of the phone to execute Android/Linux code.) Tj
+ET
+endstream
 endobj
 15 0 obj
-<<
-/Count 6 /Kids [ 7 0 R 8 0 R 9 0 R 10 0 R 11 0 R 12 0 R ] /Type /Pages
->>
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 14 0 R >>
 endobj
 16 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 2005
->>
-stream
-Gb!#\;01GN&:Vs/fLPAL(u#n^jISnhBfk^Y\O*4?_H+H@Q@+i8_S<jNC`,c7\7p"?D.X\q,ji(up[,++KE-KgqgVoQ>V0?**C:UZiXWiXO(%Pbr`i_+EtNRG-ODt1_oRmX"$ZIs.%DP]nA?MBZP\)]B9n'Q?/T."J,TQd'qQF3AC$96F)i8tfd+O\(Bk5igU5rR'"DM4Jf-5;-k!PJ-!q+N)SXR%8GsJY^;JrS(`mQ`J:HV*,EPJ4p)p,E*/5@+A,?ddB3@'_497J94.'NFR[;+3f\da^-(8/W?XsCMk!9\LM$*<Blm-njf^uo%1&;JH?MA*tKeS+J8M[oshm9n+'P846dNAg7c0%*%kth6D%,>jL_[R7VQ\$<$Yeu;hi!J2kko%JVCM'ic'84%=C6GGH<+)=_i?<A4TFZ[8M2=BDZ)4bB#Z*"t!`i8&!D2fIkEaMnOuEoh,uM#L[8WMp+</VR66J7$h#E1!/i7roPW%\V"o^e-r'=2C'c0K/3N+fHb_I(kQ4K2hQ/3CI4,5_O8l_(FJrorKGOl=LV;Q0&(>LbUaIT3V@^%7h6RAW=El.^8MGh'Z[M[Ua(0_u^#?9510+#P6MGhu`lob&(^I!Ksh.R<)0CU8/c]JU3Kd826T@"gR]T2(E23oQ4S#RZQpN"K&)Z?o6h^GEMc`'g`-1YH^6BQ?=:/i7/2;']M$?]6^Hm2"c>/T+\Y9)I+^(R($*`O9n/V/=_$2cIsNt]`T$\S1?0Tg;-!'Vr[EDSQ'XY+WH$>NS6&%,7/d`CHbK@!1e+BS]!XlZ7B-o?-pHHQIMA:*<eq[-K_UN>iklQ.VGg!/<oN1meJJh^M-'>=+`)GHbQ6Vj[%(\N*ParKeWiL_hp*;/GRG/1K8Vq'j)-)YB[Us!e4Ff?:VD5j[pG!$p`[Fc[(PIMrU@g^OoKdf%"j5*cb\-L2H[mE,ohooup66W9_L"hq'WG>,q8;.I*X^!I(YbTocL)<Op"-tbk=H7ft>'(Ie'(#[1Ab\*tNgAO.cZ*54XPqfO$F43lG=aYi;QeE3N8tr.M);#k\;#sQNSr">W[WgrC")\.?G90>:8r5h+et0#Ys)RY@[fCk+[CmAlF#kjXP?XV$V/fgYJjn&l&Se0\p*it%D:k)=&ltFS)Dd+@DqFdYojN*5%CC.3r\)qs+"-YUblDDQ+B(kN(,\+/Aja%dVU-NNLcXmfM`M/Kbh4,D<!j^Mk4gU,.@*&l(N9PY)T]r;/t*"3'(#8BjBHei3%/`IiA4Ck'QC9[ahsMe.smlL8ipK6q6.WMKJceX2kWPM&SiU2"8M-__!3j1F3inbReLi)6>Fs;Zd4gVl"9Co/B4W8*h`@.G7T]=R`1Hok>RF5('RR>;ZO6bg):$a*UK"/.=>9;.p[7WAT<`&FV>L9o5Xt%T@2E#4pg$qnB&B*n&n+P+)6a8o(U>HV*`-NbVTsaACi[_:Rt2-IF)fg"``95')ut`,o^'cb!(ULrht'WY4J]<AJsJR=3sX\_&r-$Al.<_D;DGFBFYFHNG4jLplQuXImK7VbqdRl2`9<AjY#7KL;_E?a;b?0.aBj$LDh<=_bU,296HN\gInnrIMjuDs^Hj1M^9(`\q:>jKPE2"uPQfIdErgIQ84kn-u8;:T4CT+nh>_R)(`9o!>eW49"`L,dtkP%ZuNqFOCDWCY,bPDRA7\NMG][Y"@LZo6:q9jgh=)<oVr.3"n@:0'1E--p):WaFkXg7q_9d:6/.6D-RK+p9Ok]G(FKO="!EAkH8#iSF4C>L@9*8%?.4R\5Dh^FG):XW>FfDdhf2rTY#AT!HVO]oUU(D?(OVL8Y/R::6*at:%55[g3qcMYo-8g#X;ULBbI=>BLlA*PGA'Yf!j5Ja!YPX&!?bi:$k201<:>"U0f87kWbsc5>I]8ZopT5o5-c1r%c@u5F\`Lh8Fb#h<\4b2Z$WEj#q,+Ib4.2`p*,`lCL]LVk3#\roo_\0#7)SH]Y&?CZ<?_Job9t4T<L^EKc$5IfXFjCfC~>endstream
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 6 >>
 endobj
 17 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1556
->>
-stream
-Gb!#\D,91]&H9tYQnO_<eMpmUD`J-'iAg7#&4hZT)/\_7ZGlP6G1R_uYOC+=I%cC:j;sJ<5f'\2o/ni#b_ujqpdN>t@01Bc_!mcmYom-MYmhY(>PJo&I6/\.s)_Lnk`&ib_?4G#*rL_.s0B&n'o)Y?NaWO?oj'7&`u^]c(aJ%N[KghQ*$DXJGV$]&cE$R"nZNN%I:+u.Xg#J,M.c:(o'OXPT>/)B+cZuG]#Fq`)I(;E7?dO`Y(`Z%<o1?ui;fuAmL.b&PAY%e@hCnq#2/;OA?S)UYP37)];lS;'mo(O)ec-.TUl)pk:DN/'Yn/",#2>rO*ZG(e/`VKeW\YfZo=00Sh=1,^HdY;_rjYuKNdsN/Yi5%Co95Gjd`JZ#I&&dljadMc!XB_1FW5u9.`6=&MWC'J/s>J6/2^YUBf):C!7gs4:<9q6F0M[B*Qi.#@M8adhV?d[]]NVM0$]<g/@U(4)X9K8B37;%VCB(Yqs3GOIVM9\*ieUb&W:4Ih_.1bCi=R7>N]$DL%\c5U;_K<+o*e+W6`jPfBAr%L3rM5IBof>>74^<aYE1k=Gp8.[H/9"V6eG'JcYH(.ug-!&oB7E0\d0L1tU\7AD0L-VGUk+Y[]1e9jhTh8Y<=pP"gbPKo]J-,X%ETc!"d?KL\0>,9p3JL[=S/%UO\WZ.3Z<#\o1dnirNj1LS_e<W2#15R3>Q%F^H&!OUcEYBTHU3mZ"VJ0pfK9hJ(k_X0R:#IV<0.F:"UdIAhef2Rq9GAC6OstOLqj9%&l'jU%ehW??AoAM@]/()+FJ[Ru4L@s>o(ta>m7EY?&DrmD>tO8-E?nJD1fZ+q\@j'&ofGf<.AJZE["<trE*Z.NV7b[2@<*)J7!6[X2KDBAIZ/+6:?#D\mOXrO2iVgg8qk\UKLk*u.U1DC1pWUt'"]gmYk+[6<a(ZZL.[+d>&<:f?1a<]QGW^cq#rRk[gB@[IA*A.Uk:i^7%Qk:7m5@VMOINCEFR7u]\X4ZSX^K$<DuUuWgksm>B,A&Thm26aB*.R)msLE98(n5)P!Eb_u(`Ub`Krk2<lNL(Lg`Dg8M6h"q@ggn!t0![bLoU9T!JIbXsQVRR5Of$iC=UW]:dB@QOI6?fm)6>=?uHbU*BbYB^&i9JYCJYTmitc)@EI^kq%<FNc7!/tpqL$_IGB8[s!rhRZrkEt)[%ULa3&c/bkd$%#X?l<IWAnf:.$H_jrbGMXVq>Itnb&hpE&C'R:4&Ilt*iBqS%og%aNY!9P"bc"jWX?XYpNs:6hDe'9*Nt#aJ4/__r.D:(9.Za6-i#8X?.T\QF*`7q:$&(%)DK"u0Uq"&S&0QLaZbHK-+Z1hE%P68$4u8#j;[p!Z90DAl%u\n\o,XoRr*;r-a/DRH==s)-Of[nmLu`^/C643I8BF2X]F:1'FTe$fiUNdiDh]2_mP,#>#q1qZY\gcmGf?r'NpU-YETKZF+_=rm:`C*B%$ebSr3U:09>#^]p?WG>')Ta<_F=11EajObRP4>fohY^8fp-HXgYNtEJct6N&rqr_qsAPm's9"96rJKZir&Rl:C_"o3;XLA[ES@~>endstream
+<< /Type /Catalog /Pages 16 0 R >>
 endobj
 18 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1584
->>
-stream
-Gb!#\gMZ%0&:Ml+bY*MoW3rGh?GJf>+:Alh'\V(+#&R5G)MqEafh)1W6gA,2ZE::=!UKfH/.Lc_3'8uA$3^C-rE^3=pN--%K`ZC*Sc\R*+6Hqh@=Ifq6Q=,i`1)l.3%chnC#gK`*d?%m97no._/TR,8mH<t)MNVCC2Fa5c6b.oE.-);J"-HHo7$sZkJ%kYh[Vc*r'O8ODhu*a[t0*T:0a:)?c6X[Z\Agi2-Y,29QAEjSlLl/8qQ5$Q?^)Oq2T7V9PaR\!!jLpjp+]!C#">S!9l4^$+S",>M?E0&9:S<"X24&Y':"lIs_8GT\=?]SE3RbUu9$V!c(q)T'\MmrV?2c^ZP:F,^G#7Yr'^+c?UtX.6WAR6pD$:<q?Jsga*7n_$%hAJMpJ5Z&2<a[b>8Ja=cL+T1>UcrDQSjrfnIdcBE74r:_T_33$.#C_deU&N&:DM:qjR0b6#Ao6p;-mI<a/<e4LjY'-0`"VXED"W%mp)5bI,+XC-A#.Y_5Pn[r0MAhO\aq?IHcH.g`8VSA%QLHt3/dPhSPuL<g4jt-&A])r-_6SG;?NDm]Pfs0o`^ii-;07CCJfsn4QL$I.&50$V/%eiobho((eRjIPK7KJLe0ES.(p,/M`f+KS`!@4PC-nft9?9gg/8RA;Nu]IVP1Vil0&hG(Mi82!+DQp,Ik,Ob!_WpGl-Hmqe<ndG'n7h2au!>2;N)_4>n'-JjTo;dN5/i>WDn4<P$TYqKiQ21]\AZJK9FC$jTof$Tm))_I,FfDhX!(+!62^:B(J_D1e2+T1ZreJ@DCK;httF*WNsb]_-\b4@Qodeie=:<Tk>_t!ko<fp`<PpK0!L]!#TGD]sr^7+X):YE6-P,1^8^>/m]"Se^du`&DE#DXl#%7Wet474;oat3_MFpm-n5\7S\pZT$>f,&^Ctu1Bb,Y)q.Vu`86M<4-jfq*iX$pfM!>N4X)[Q<Nli)qiN=N_O9%'A50+e',kM\-=bCAp670dYFtdj7L:61!P\oZ:[<iP>iht=karDsDRO6U&h=f'6.b_L:s`#WBf+8XZr)-KOLBblFD)s*K%N$L3fUQ31aUX5.bJH?TjY",Y;(*$0,V1ld2i!q":n4RE>o=/Ns`=m]d'E3O[?bOhV%Gr>h2%^+(eu!:UnM11s\n5fpj^\9XZJ#CRGrrZcYf[$lk^#Dp=[ea\+ZPH1i8(l.R[NR[5TG"8r!+LqeF)QA7!3_1S\alQ!dkVf`9kI8@N\fc&+&I+u`d_.KQ3B;2QQ=F+pcOim=^r@0C0"USgu-"$6g'>$qN37KqW2&"`r>3Nr<+>GMOekMuB\7nqZ<m)R6/$f)tJ[p3(Jp2oS_=WpgK.THB;aaM>^#HVfp`Js*)gmN;'tVm1aSh-C7bXF5e[QaGkbTbBMRq\RE/UtbLnp8;L1s`[];Hm$:?f.)r":W!LP,Tl'3i:ZR)Z\9ip*2T*EKq;Hq)hK^FPksM.Ag#]?YSH!i`*O)$S9B'&1$$k[U5t3YjFpFX&iGAL@;&R[BMQ;di/67A8>>pDIm>BB6;!W+HX5AhFi&k/T#9G8.:&`0]pbU6&XpY[#@qrIo[%dI0m:"V5MM"jC=SZi~>endstream
-endobj
-19 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1787
->>
-stream
-Gb!#[gMYb*&:Ml+$jnQ4>r[]e9>:%,YmJho6(9]8]BE`j9=2Zt7&gr4a8PitUuZl3,JcRF;]%,I)@kr#3AV#`a'[c=PCi"59G\cP$:5Y,.>YWm`h2Moq!@0Hcs"FP/GB#Rhaqh]gV)`JV$glD:[a]`B>1_$ZST)uf&"<<#F>Uaj'f-(]t9QUoX6O!E#`OUr3>=>WQ=Q(>G!&9S]:]VplF"YO,b(SdFstQ5>&?A3q0V;rQ2K\Ir-`9q1Bt(I^&4mn*e3"1.FV0hG6]r)E'&?q+M.,OV]r*5^n.Y)]=ZA$HAL4aSm\^V%&WC-9P^Z`CUmre=9TN1/84R+)%ZS5t^]h24`0sk#KB!>%h?GOWm8OP")K7a)\/E;2NHIQa@RXU>XIE1ks%MM`KCR0M,.o#[#eJiMPTiKeL]oHq@f4Nk`4GD4GA\Y>g7DELU?$OpO.D11P9sVX$&*Y0']>3khWCF9tU^B&(Bk\Pf95PLRLWLAg.H4dK)C8ZfB`l*HKE,F(qA@>'f.MosZk<(>sE]Ak'Q_pB@8M!Y*s<7e5@4V-F9]M;72dRgT,]RuKEFGmcK-E*9[mG.Gf.#?n9N>G<TN0$]D*FDafk99qhR-"l`Mk,raCWUV.]=bb!Zrstg,sdN`8"Zr?JLj)H^s<KB16H)V*T1V*PdpcOc0?pq44N7DA[]OW)V1tk'kS10m7qJl+JUr8BI`F+0\ut@6":R.)gC41**=Xo,n!_*A#q4Ae(,V9!hS"(c'b/SZS&F3s(mRNXdFOadduI=F:VD;$!]bgd"UT@(Jdir2"pes4?UB6:S0b!(^7a+]H@^Sl]AXd4<\gtJMV6bq492&;PmWSPX^t0FKLYG4.pSIA0-dUMPJe/ipH#-aa%Xmf9FJ]Yie"uKZRE*W+aoEPVJ^]//<i=-!a/X'gP?O^5?'*XJU*0Aa@>#N+GCiNCtb$11s5bJ&h'bRPbm1d%PBQ/#k@rk8fukD]FAl/Lq3/USJKTO?a-jJmdt"[H1%mP_R\h`,nM3f!]@hD/-H3VYLW]_=^ClUMb<=n&JFC'gp*)AZ1gf1-u6oA>pN'OHgX';QohR/2:<+2=MjFimp+66:3lUcFL#(>H>-ZnXVPC-1kN@V*\L@]e+&\mRPM:&%:9UQ-K:!(.:)gD!a<jCPU9#<q'+TH)hUf4;Eh#s!1EW,Hag6C"EeAY6(o,Og\^EnXm4VZeRGY$fqZp6YOCGi/8Ri:BG2koBkqiQ`[>oIej$V(AU?]mc<Z$:4+`E]EhNKfLHO+636gpo`S)cd^JK/(cl(b4GHQaHkr5j'(Q?;^kBQH;9'68Q,\X^1#i3T7lPVarkf#$W3jHD,=;=U6o5W=YEl-eU7tUI6)[aHk>#fm4glPcPFNG+J&L``qob#.1pNP^P[N/D0:L"Zl]bFZ>YX.3d`W:O8$AFl0in(%DU]2%LVIg\Tp@,G"t&&g+ZjSGX=HA:]<o)80K#0^ES%?g_:ff%"iK:$joY(gktOO5<rOV`"+g2YGIG#])t2Rj&W)0N5aZ"/88T;gcY");*A+?qR4TqO[,Xjo:$1RC)^fr]$_F[X24pXI2Pb6dF:-7]Q1FKo($+L0M#C:_#k/=Vj4[SF^@aEe^W:\/&GHAlo"m@)qB:.?T\k\(#=8$POQ)hoh_t>8n+Nu+qp?aNVlu'r^+NUOk2,JEV`Vol5<CAtUhr,,cI+R[:*b2Us1&!b[<Hid0(-KC$(>!2A'T^T$.PuHAPJXUG6FIoKJ5Zbb2-:/m]=@?F$**D=6*/i<P4?jRo[nhmf\WC*]3A7'^=sk[EimV~>endstream
-endobj
-20 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1987
->>
-stream
-Gb!#\D3*[7&H9DY@WYMED8h5T5R@+DH]qJnmCbc-T1re1-*ae"Z7PtIS["@iNWgodQ+A>_OMpk:1XF9-P5p".(YI%Z#C&1_rhfaJ&EZUkL>EL(TAei.k4'dsT,^:EE?("O&/X-Oc]@>\\:*'=K2E=Qi.[rb`"0['"QO/T#/-`76$jq2bAmLE@/Xs9/'S#Ug33H7mJO(ra`uIGjRL7!f+61m7g<;dNko):=$(")qCH1M%&r4jUaffn9+ZB2nXRc8au+rg$r:+ITd6Q_?=>.IOsM'n>1csLm0Fa4ItNc24ZZq\_I:W]1-DsX,YDjDPVE(7'BDht$hXp$QA]S2KB^:4T[>&LX*Ii^.HCiNZ0XSPd3Nl>*o@irc^F4=cl7*Y+'HcWf(,>&[W56h\M<m8>_lL(SjbgO:7jFC(7ep:,R<;,ACbKg!)s.>Un"8EaAfJ(pqP6Rai^hV`o1A&n,\][-p5!mC$i_t;_!d82jW>J8sWXl):q\u<N8GuY[YRUQki4r?l?hPmU4:u,O`OOs*amL9%.'q3rA30$UTI?1@)c"/T?]m!)nb+"3GhGa3++gBmc8G]O7QY>>m+-(LW*ngI/jClO0YOiqPX9_;llAF*iWSZ:&UFU6,gn#TBJ(jd,/NTRI8;S%<:;P!'`h[YNL<SQD\A"\!3>7)H6Gf=J#.Og0S;Q^es^=&\2_2_%J2-9inHei5!TN!`$%bNM!>7E4BmLeV)RALRe0JTTRJO)h\Fd)o<<d4Vb1>3nM=L1a-ik%if[,0\P`HcSP4qIIj4!cI%Hg^.F574D=crj(&<JLNS55g>ta-PC.UB\B_=o&i?-rFoe)nf0+Y,SKO][!'GX_&g`SUEDk&Q5ktB>,ut"Tb%T;8$66O+L8PP3Mcbc+CKFI-1W`2?6(%CQBrn<>k2OJDb<ShL(Y"1L$pJA"RtRoF.C0bY.I,n2#I[3<!R5\^mPZA.-4_uFtr@2'9_X"_B`G\7#JWZF1eNp[Tlg7k4l8:eu/XCYTOWSLY")j;j+/&%6JIW0IUKY"3`*(_6sbdDCr9=EFT,>ZE164SdMf<M@qIo2W^cCN5?nYSfcqK(d*:'%"]>/?khV0j.bsN'A=ddObmpcILqfd6AcuY;6C%ben3=2j9=>.$[)Xh89)'JnX9uW,pefbKE0?"$U)B<MF<qr3It*QBq(97^_m>n&PoBeG(PrtUe2`n?7=#J@c,r3?4A66"-ml%fj=A0,Y)d*K=s@HiF(h!<5Ss4-tFaR)G;)"W&d0$Ks#gF_`0\#%L0f_Ic?o*^1rZ[.;,$XkuXb8.Bb+*kU]2#j@*U`]n."%J04TX^E@@1EcfVL*o-?'h0&_U^%&q9-NJAYKELD_IilgFk:8kZ9sI-k,mcen-oU$p,LmR/]5dpi_J&fX<Z)Ol<+rLS]3^4&jVM[M+GcP=7sDgAoLbd`4'r$2+3++OX\3BpjZL4$jfie8"&YfR-hUMJX^6m\Mjbs,iK"^DD1*Il0V4fO-&U#OIngj8i,#Bb3'H0a8ZYk7NBES"W0XBGTT8(LJenp;Y8*dDkJro6j.aq\:NI6*hPX=iQTOLDQ`3uIkZD7.b>QEgDatP@-`LOda"@#VO7e*tS[7%^(X__JKe2k'$`@V"/#[jQcFQ#N^Do>i?JRo>I_6mKdTjUk!)%Q_8V)T3hujD'jL)!m]CQacI-3$0:7)+l>,CkC%f8bJ-\tP5ZQORr@b0speVK:#Z6aclEYTl`[aDb?CI"Eg[4-&E,'DP#NFms-j\G2J_IRbgO9K'^j8Vjq^9=mj)UEBpX"J)%`gW+1o<]50_/Zo4_@ii>GV,!6lmI;2cDDa[<OP4395?]%^7jua`]ZUs*_3]!D&D)Q/+J(/H^H[o=aEp1_e.N4:@3Kr=/"'g(nOm^5cf,c+d*m^`)rm9@4/RW"qo.3<Q22GV+l/dI<Y;>J/uh\-$lmb1YE*=/'UUEOf&XMHIdRiYf!+TKBNIDNL]C(6IH6rN0d$[Jt'LUlp,Nm~>endstream
-endobj
-21 0 obj
-<<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 332
->>
-stream
-GappYd8%S5$q9(N(&*]=:q)C$dN/XFV]c'J+-7i;(<GKuUgj4J]T,^P,4#+%fT*gB6B/2)"-4AL(Bl[Om\$#[J_o<f=$MuHG:o1*/ltb1QNkiMURnoZ[&PYDTrAjTq_N&3ap#76_'XIuk]\!QQA=DF#;]oJL*P+XZ&UHAGA,*U9ISnLHM`BA=F[t9)joinnSpP(KLEg#d5%%nj2>d:gM]^D^4lQ<^;FL;pOR3;m#VVDYqsN#RRHYM;!NucFIXJ]A@=>C=_9#QP^G-@$2GX)bIC,ZZF;Ni&&'%"h'ekU.=<.-#I6^jb:V37\s=Ae(QWt.]*,,uT/gs:~>endstream
+<< /Title (iPhone 6 Plus Android Bringup Report) /Producer (iphone6plus-android-port render_markdown_pdf.py) >>
 endobj
 xref
-0 22
+0 19
 0000000000 65535 f 
-0000000061 00000 n 
-0000000132 00000 n 
-0000000239 00000 n 
-0000000351 00000 n 
-0000000466 00000 n 
-0000000571 00000 n 
-0000000654 00000 n 
-0000000849 00000 n 
-0000001044 00000 n 
-0000001239 00000 n 
-0000001435 00000 n 
-0000001631 00000 n 
-0000001827 00000 n 
-0000001897 00000 n 
-0000002193 00000 n 
-0000002286 00000 n 
-0000004383 00000 n 
-0000006031 00000 n 
-0000007707 00000 n 
-0000009586 00000 n 
-0000011665 00000 n 
-trailer
-<<
-/ID 
-[<8bb1519a205b955c56a6719deafd2e00><8bb1519a205b955c56a6719deafd2e00>]
-% ReportLab generated PDF document -- digest (opensource)
-
-/Info 14 0 R
-/Root 13 0 R
-/Size 22
->>
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000228 00000 n 
+0000004076 00000 n 
+0000004223 00000 n 
+0000007731 00000 n 
+0000007878 00000 n 
+0000011556 00000 n 
+0000011703 00000 n 
+0000015571 00000 n 
+0000015720 00000 n 
+0000019869 00000 n 
+0000020018 00000 n 
+0000022657 00000 n 
+0000022806 00000 n 
+0000022897 00000 n 
+0000022948 00000 n 
+trailer << /Size 19 /Root 17 0 R /Info 18 0 R >>
 startxref
-12088
+23076
 %%EOF

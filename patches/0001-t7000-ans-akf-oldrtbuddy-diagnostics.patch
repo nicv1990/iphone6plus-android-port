@@ -36,10 +36,10 @@ index 0b85ab61a..1e5974655 100644
 +apple-t7000-ans-probe-y = t7000-ans-probe.o
 diff --git a/drivers/soc/apple/t7000-ans-probe.c b/drivers/soc/apple/t7000-ans-probe.c
 new file mode 100644
-index 000000000..62b9f0575
+index 000000000..51855ba42
 --- /dev/null
 +++ b/drivers/soc/apple/t7000-ans-probe.c
-@@ -0,0 +1,1156 @@
+@@ -0,0 +1,1911 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Probe-only helper for the Apple T7000 ANS/ASP storage path.
@@ -57,6 +57,8 @@ index 000000000..62b9f0575
 +#include <linux/slab.h>
 +#include <linux/string.h>
 +#include <linux/delay.h>
++#include <linux/dma-mapping.h>
++#include <linux/mm.h>
 +
 +#define ASC_A2I_CONTROL		0x110
 +#define ASC_I2A_CONTROL		0x114
@@ -87,6 +89,13 @@ index 000000000..62b9f0575
 +#define AKF_KNOWN_BOOT_1	0x0600000000000004ULL
 +#define AKF_KNOWN_BOOT_2	0x00b0000000000010ULL
 +#define AKF_KNOWN_BOOT_3	0x0070000000000001ULL
++#define OLDRTB_PKT_MAX		0x120
++#define OLDRTB_PKT_HDR_SIZE	0x10
++#define OLDRTB_PKT_PREFIX_SIZE	0x08
++
++static const u8 oldrtb_packet_prefix[OLDRTB_PKT_PREFIX_SIZE] = {
++	0x04, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x00,
++};
 +
 +enum t7000_oldrtb_phase {
 +	OLDRTB_PHASE_UNKNOWN,
@@ -118,6 +127,50 @@ index 000000000..62b9f0575
 +	resource_size_t size;
 +	int pm_ret;
 +	struct t7000_oldrtb_state oldrtb;
++	u8 oldrtb_packet[OLDRTB_PKT_MAX];
++	size_t oldrtb_packet_len;
++	u32 oldrtb_packet_format;
++	u32 oldrtb_packet_seq;
++	void *oldrtb_dma_packet;
++	dma_addr_t oldrtb_dma_addr;
++	bool oldrtb_dma_coherent;
++	size_t oldrtb_dma_size;
++	char oldrtb_addr_last[32];
++	u64 oldrtb_addr_last_msg;
++	u32 oldrtb_addr_last_a2i_ctl;
++	u32 oldrtb_addr_last_len;
++};
++
++struct t7000_oldrtb_packet_variant {
++	const char *name;
++	u32 format;
++	u32 word0;
++	u32 word1;
++	u32 payload_len;
++	u32 total_len;
++};
++
++static const struct t7000_oldrtb_packet_variant oldrtb_packet_variants[] = {
++	/*
++	 * Derived from iOS 12.5.8 RTBuddyManagementEndpoint around
++	 * 0xfffffff0080baa98. The first eight bytes are copied from rodata at
++	 * 0xfffffff0070cb080 in the iPhone7 iOS 12.5.8 kernelcache.
++	 */
++	{ "old-small", 0x00, 0x06, 0x11, 0x44, 0x54 },
++	{ "old-0x40", 0x40, 0x07, 0x44, 0x110, 0x120 },
++};
++
++struct t7000_oldrtb_addr_candidate {
++	const char *name;
++	const char *desc;
++};
++
++static const struct t7000_oldrtb_addr_candidate oldrtb_addr_candidates[] = {
++	{ "addr64", "send staged packet physical/DMA address split as the AKF 64-bit payload" },
++	{ "addr-shift4", "send staged packet address shifted right by 4" },
++	{ "addr-shift12", "send staged packet address shifted right by 12" },
++	{ "addr-len", "send low32(address) with packet length in the high word" },
++	{ "len-addr", "send packet length in the low word with low32(address) in the high word" },
 +};
 +
 +static u64 akf_read_recv(struct apple_t7000_ans *ans)
@@ -656,6 +709,524 @@ index 000000000..62b9f0575
 +}
 +static DEVICE_ATTR_WO(oldrtbuddy_ordered_reply);
 +
++struct t7000_oldrtb_txn_step {
++	enum t7000_oldrtb_phase phase;
++	u64 reply;
++	const char *name;
++};
++
++static int oldrtb_send_phase_reply(struct apple_t7000_ans *ans,
++				   enum t7000_oldrtb_phase phase, u64 reply,
++				   int *wait_samples)
++{
++	u64 expected = oldrtb_phase_msg(phase);
++	u64 cur_msg = 0;
++	u32 a2i_ctl;
++	int i;
++
++	if (!expected)
++		return -EINVAL;
++
++	for (i = 0; i < 256; i++) {
++		cur_msg = akf_read_recv(ans);
++		if (oldrtb_classify_msg(cur_msg) == phase && cur_msg == expected)
++			break;
++		usleep_range(500, 1000);
++	}
++
++	if (i == 256) {
++		dev_notice(ans->dev,
++			   "T7000 ANS AKF txn skipped: phase not observed cur_msg=%016llx cur_phase=%s requested_phase=%s expected=%016llx\n",
++			   cur_msg, oldrtb_phase_name(oldrtb_classify_msg(cur_msg)),
++			   oldrtb_phase_name(phase), expected);
++		return -EAGAIN;
++	}
++
++	a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++	if (a2i_ctl & AKF_CONTROL_FULL)
++		return -EBUSY;
++
++	akf_write_send(ans, reply);
++	if (wait_samples)
++		*wait_samples = i;
++
++	dev_notice(ans->dev,
++		   "T7000 ANS AKF txn step: wait_samples=%d phase=%s expected=%016llx reply=%016llx a2i_ctl=%08x\n",
++		   i, oldrtb_phase_name(phase), expected, reply, a2i_ctl);
++
++	return 0;
++}
++
++static int oldrtb_run_txn(struct apple_t7000_ans *ans,
++			  const struct t7000_oldrtb_txn_step *steps,
++			  int nr_steps)
++{
++	struct t7000_oldrtb_state st;
++	int wait_samples;
++	int ret;
++	int i;
++
++	ret = oldrtb_collect_state(ans, &st, 64);
++	if (ret)
++		return ret;
++
++	if (!oldrtb_state_is_stable(&st)) {
++		dev_notice(ans->dev,
++			   "T7000 ANS AKF txn skipped: unstable loop samples=%u unknown=%u seen_mask=%x loop_count=%u\n",
++			   st.samples, st.unknown, st.seen_mask, st.loop_count);
++		return -EAGAIN;
++	}
++
++	for (i = 0; i < nr_steps; i++) {
++		ret = oldrtb_send_phase_reply(ans, steps[i].phase,
++					      steps[i].reply, &wait_samples);
++		if (ret) {
++			dev_notice(ans->dev,
++				   "T7000 ANS AKF txn failed step=%d name=%s ret=%d\n",
++				   i, steps[i].name, ret);
++			return ret;
++		}
++		usleep_range(1000, 2000);
++	}
++
++	return 0;
++}
++
++static ssize_t oldrtbuddy_transaction_plan_show(struct device *dev,
++					       struct device_attribute *attr,
++					       char *buf)
++{
++	ssize_t len = 0;
++
++	len += sysfs_emit_at(buf, len, "oldrtbuddy_transaction=v1\n");
++	len += sysfs_emit_at(buf, len,
++			     "usage=echo '<plan>' > oldrtbuddy_transaction\n");
++	len += sysfs_emit_at(buf, len,
++			     "plans: canonical4 oldecho4 mixed-power-first mixed-state-first\n");
++	len += sysfs_emit_at(buf, len,
++			     "canonical4: state12=0060000000000012 state04=0060000000000004 ap_power10=0060000000000010 iop_ack01=0060000000000001\n");
++	len += sysfs_emit_at(buf, len,
++			     "oldecho4: state12=0600000000000012 state04=0600000000000004 ap_power10=00b0000000000010 iop_ack01=0070000000000001\n");
++	len += sysfs_emit_at(buf, len,
++			     "mixed-power-first: ap_power10 canonical then iop_ack01 canonical then state12/state04 canonical\n");
++	len += sysfs_emit_at(buf, len,
++			     "mixed-state-first: state12/state04 canonical then ap_power10/iop_ack01 canonical\n");
++	len += sysfs_emit_at(buf, len,
++			     "guard=each step waits for its live phase and exact expected message before sending\n");
++
++	return len;
++}
++static DEVICE_ATTR_RO(oldrtbuddy_transaction_plan);
++
++static ssize_t oldrtbuddy_transaction_store(struct device *dev,
++					   struct device_attribute *attr,
++					   const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	char plan[32];
++	int ret;
++
++	static const struct t7000_oldrtb_txn_step canonical4[] = {
++		{ OLDRTB_PHASE_IOP_STATE_12, 0x0060000000000012ULL, "canonical-state12" },
++		{ OLDRTB_PHASE_IOP_STATE_04, 0x0060000000000004ULL, "canonical-state04" },
++		{ OLDRTB_PHASE_AP_POWER_10, 0x0060000000000010ULL, "canonical-ap-power10" },
++		{ OLDRTB_PHASE_IOP_ACK_01, 0x0060000000000001ULL, "canonical-iop-ack01" },
++	};
++	static const struct t7000_oldrtb_txn_step oldecho4[] = {
++		{ OLDRTB_PHASE_IOP_STATE_12, AKF_KNOWN_BOOT_0, "oldecho-state12" },
++		{ OLDRTB_PHASE_IOP_STATE_04, AKF_KNOWN_BOOT_1, "oldecho-state04" },
++		{ OLDRTB_PHASE_AP_POWER_10, AKF_KNOWN_BOOT_2, "oldecho-ap-power10" },
++		{ OLDRTB_PHASE_IOP_ACK_01, AKF_KNOWN_BOOT_3, "oldecho-iop-ack01" },
++	};
++	static const struct t7000_oldrtb_txn_step mixed_power_first[] = {
++		{ OLDRTB_PHASE_AP_POWER_10, 0x0060000000000010ULL, "canonical-ap-power10" },
++		{ OLDRTB_PHASE_IOP_ACK_01, 0x0060000000000001ULL, "canonical-iop-ack01" },
++		{ OLDRTB_PHASE_IOP_STATE_12, 0x0060000000000012ULL, "canonical-state12" },
++		{ OLDRTB_PHASE_IOP_STATE_04, 0x0060000000000004ULL, "canonical-state04" },
++	};
++	static const struct t7000_oldrtb_txn_step mixed_state_first[] = {
++		{ OLDRTB_PHASE_IOP_STATE_12, 0x0060000000000012ULL, "canonical-state12" },
++		{ OLDRTB_PHASE_IOP_STATE_04, 0x0060000000000004ULL, "canonical-state04" },
++		{ OLDRTB_PHASE_AP_POWER_10, 0x0060000000000010ULL, "canonical-ap-power10" },
++		{ OLDRTB_PHASE_IOP_ACK_01, 0x0060000000000001ULL, "canonical-iop-ack01" },
++	};
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%31s", plan);
++	if (ret != 1)
++		return -EINVAL;
++
++	if (!strcmp(plan, "canonical4"))
++		ret = oldrtb_run_txn(ans, canonical4, ARRAY_SIZE(canonical4));
++	else if (!strcmp(plan, "oldecho4"))
++		ret = oldrtb_run_txn(ans, oldecho4, ARRAY_SIZE(oldecho4));
++	else if (!strcmp(plan, "mixed-power-first"))
++		ret = oldrtb_run_txn(ans, mixed_power_first,
++				     ARRAY_SIZE(mixed_power_first));
++	else if (!strcmp(plan, "mixed-state-first"))
++		ret = oldrtb_run_txn(ans, mixed_state_first,
++				     ARRAY_SIZE(mixed_state_first));
++	else
++		return -EINVAL;
++
++	return ret ? ret : count;
++}
++static DEVICE_ATTR_WO(oldrtbuddy_transaction);
++
++static int oldrtb_ensure_dma_packet(struct apple_t7000_ans *ans)
++{
++	if (ans->oldrtb_dma_packet)
++		return 0;
++
++	ans->oldrtb_dma_size = OLDRTB_PKT_MAX;
++	ans->oldrtb_dma_packet = dma_alloc_coherent(ans->dev,
++						    ans->oldrtb_dma_size,
++						    &ans->oldrtb_dma_addr,
++						    GFP_KERNEL);
++	if (ans->oldrtb_dma_packet) {
++		ans->oldrtb_dma_coherent = true;
++		dev_notice(ans->dev,
++			   "T7000 ANS old RTBuddy coherent packet buffer: dma=%pad size=0x%zx\n",
++			   &ans->oldrtb_dma_addr, ans->oldrtb_dma_size);
++		return 0;
++	}
++
++	/*
++	 * The early bring-up ramdisk can lack usable coherent DMA memory for
++	 * this platform device. Keep a physical-address fallback so the packet
++	 * layout and address-passing model can still be tested on hardware.
++	 */
++	ans->oldrtb_dma_size = PAGE_SIZE;
++	ans->oldrtb_dma_packet = (void *)get_zeroed_page(GFP_KERNEL | GFP_DMA);
++	if (!ans->oldrtb_dma_packet)
++		ans->oldrtb_dma_packet = (void *)get_zeroed_page(GFP_KERNEL);
++	if (!ans->oldrtb_dma_packet) {
++		ans->oldrtb_dma_size = 0;
++		return -ENOMEM;
++	}
++
++	ans->oldrtb_dma_addr = (dma_addr_t)virt_to_phys(ans->oldrtb_dma_packet);
++	ans->oldrtb_dma_coherent = false;
++	dev_notice(ans->dev,
++		   "T7000 ANS old RTBuddy physical packet buffer fallback: phys=%pad size=0x%zx\n",
++		   &ans->oldrtb_dma_addr, ans->oldrtb_dma_size);
++
++	return 0;
++}
++
++static int oldrtb_stage_packet(struct apple_t7000_ans *ans,
++			       const struct t7000_oldrtb_packet_variant *variant)
++{
++	u32 i;
++	int ret;
++
++	memset(ans->oldrtb_packet, 0, sizeof(ans->oldrtb_packet));
++
++	memcpy(ans->oldrtb_packet, oldrtb_packet_prefix, sizeof(oldrtb_packet_prefix));
++	memcpy(ans->oldrtb_packet + 0x08, &variant->word0, sizeof(variant->word0));
++	memcpy(ans->oldrtb_packet + 0x0c, &variant->word1, sizeof(variant->word1));
++
++	for (i = 0; i < variant->payload_len; i++)
++		ans->oldrtb_packet[OLDRTB_PKT_HDR_SIZE + i] =
++			(u8)(i ^ variant->word0 ^ variant->word1);
++
++	ans->oldrtb_packet_len = variant->total_len;
++	ans->oldrtb_packet_format = variant->format;
++	ans->oldrtb_packet_seq++;
++
++	ret = oldrtb_ensure_dma_packet(ans);
++	if (ret)
++		return ret;
++
++	memset(ans->oldrtb_dma_packet, 0, ans->oldrtb_dma_size);
++	memcpy(ans->oldrtb_dma_packet, ans->oldrtb_packet,
++	       ans->oldrtb_packet_len);
++
++	return 0;
++}
++
++static const struct t7000_oldrtb_packet_variant *
++oldrtb_packet_variant_by_name(const char *name)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(oldrtb_packet_variants); i++) {
++		if (!strcmp(name, oldrtb_packet_variants[i].name))
++			return &oldrtb_packet_variants[i];
++	}
++
++	return NULL;
++}
++
++static ssize_t oldrtbuddy_packet_model_show(struct device *dev,
++					    struct device_attribute *attr,
++					    char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	size_t i;
++
++	if (!ans)
++		return sysfs_emit(buf, "no-state\n");
++
++	len += sysfs_emit_at(buf, len, "oldrtbuddy_packet_model=v1\n");
++	len += sysfs_emit_at(buf, len,
++			     "source=iOS 12.5.8 RTBuddyManagementEndpoint 0xfffffff0080baa98\n");
++	len += sysfs_emit_at(buf, len,
++			     "layout: +0x00 prefix[8]=0400000054000000, +0x08 word0, +0x0c word1, +0x10 payload\n");
++	len += sysfs_emit_at(buf, len,
++			     "variants: old-small old-0x40\n");
++
++	for (i = 0; i < ARRAY_SIZE(oldrtb_packet_variants); i++) {
++		const struct t7000_oldrtb_packet_variant *v =
++			&oldrtb_packet_variants[i];
++
++		len += sysfs_emit_at(buf, len,
++				     "%s format=0x%02x word0=0x%08x word1=0x%08x payload_len=0x%x total_len=0x%x\n",
++				     v->name, v->format, v->word0, v->word1,
++				     v->payload_len, v->total_len);
++	}
++
++	len += sysfs_emit_at(buf, len,
++			     "staged seq=%u format=0x%02x len=0x%zx\n",
++			     ans->oldrtb_packet_seq, ans->oldrtb_packet_format,
++			     ans->oldrtb_packet_len);
++	len += sysfs_emit_at(buf, len,
++			     "dma_packet allocated=%u mode=%s addr=%pad size=0x%zx\n",
++			     !!ans->oldrtb_dma_packet,
++			     ans->oldrtb_dma_coherent ? "coherent" : "phys-fallback",
++			     &ans->oldrtb_dma_addr,
++			     ans->oldrtb_dma_size);
++	len += sysfs_emit_at(buf, len,
++			     "usage=echo '<variant>' > oldrtbuddy_packet_stage, then cat oldrtbuddy_packet_dump\n");
++	len += sysfs_emit_at(buf, len,
++			     "guard=oldrtbuddy_packet_addr_send stages bytes, confirms stable management loop, then sends one named address candidate\n");
++
++	return len;
++}
++static DEVICE_ATTR_RO(oldrtbuddy_packet_model);
++
++static ssize_t oldrtbuddy_packet_stage_store(struct device *dev,
++					     struct device_attribute *attr,
++					     const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	const struct t7000_oldrtb_packet_variant *variant;
++	char name[32];
++	int ret;
++
++	if (!ans)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%31s", name);
++	if (ret != 1)
++		return -EINVAL;
++
++	variant = oldrtb_packet_variant_by_name(name);
++	if (!variant)
++		return -EINVAL;
++
++	ret = oldrtb_stage_packet(ans, variant);
++	if (ret)
++		return ret;
++
++	dev_notice(dev,
++		   "T7000 ANS old RTBuddy packet staged: name=%s seq=%u format=0x%02x len=0x%zx word0=0x%08x word1=0x%08x dma=%pad\n",
++		   variant->name, ans->oldrtb_packet_seq, ans->oldrtb_packet_format,
++		   ans->oldrtb_packet_len, variant->word0, variant->word1,
++		   &ans->oldrtb_dma_addr);
++
++	return count;
++}
++static DEVICE_ATTR_WO(oldrtbuddy_packet_stage);
++
++static ssize_t oldrtbuddy_packet_dump_show(struct device *dev,
++					   struct device_attribute *attr,
++					   char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	size_t i;
++
++	if (!ans)
++		return sysfs_emit(buf, "no-state\n");
++
++	if (!ans->oldrtb_packet_len) {
++		int ret = oldrtb_stage_packet(ans, &oldrtb_packet_variants[0]);
++
++		if (ret)
++			return ret;
++	}
++
++	len += sysfs_emit_at(buf, len,
++			     "oldrtbuddy_packet_dump=v1 seq=%u format=0x%02x len=0x%zx\n",
++			     ans->oldrtb_packet_seq, ans->oldrtb_packet_format,
++			     ans->oldrtb_packet_len);
++	len += sysfs_emit_at(buf, len,
++			     "dma_packet allocated=%u mode=%s addr=%pad size=0x%zx copied_len=0x%zx\n",
++			     !!ans->oldrtb_dma_packet,
++			     ans->oldrtb_dma_coherent ? "coherent" : "phys-fallback",
++			     &ans->oldrtb_dma_addr,
++			     ans->oldrtb_dma_size, ans->oldrtb_packet_len);
++	len += sysfs_emit_at(buf, len,
++			     "prefix_le=%02x%02x%02x%02x%02x%02x%02x%02x word0_le=%02x%02x%02x%02x word1_le=%02x%02x%02x%02x payload_status=diagnostic-pattern\n",
++			     ans->oldrtb_packet[0x00], ans->oldrtb_packet[0x01],
++			     ans->oldrtb_packet[0x02], ans->oldrtb_packet[0x03],
++			     ans->oldrtb_packet[0x04], ans->oldrtb_packet[0x05],
++			     ans->oldrtb_packet[0x06], ans->oldrtb_packet[0x07],
++			     ans->oldrtb_packet[0x08], ans->oldrtb_packet[0x09],
++			     ans->oldrtb_packet[0x0a], ans->oldrtb_packet[0x0b],
++			     ans->oldrtb_packet[0x0c], ans->oldrtb_packet[0x0d],
++			     ans->oldrtb_packet[0x0e], ans->oldrtb_packet[0x0f]);
++
++	for (i = 0; i < ans->oldrtb_packet_len; i += 16) {
++		size_t j;
++
++		len += sysfs_emit_at(buf, len, "%04zx:", i);
++		for (j = 0; j < 16 && i + j < ans->oldrtb_packet_len; j++)
++			len += sysfs_emit_at(buf, len, " %02x",
++					     ans->oldrtb_packet[i + j]);
++		len += sysfs_emit_at(buf, len, "\n");
++	}
++
++	return len;
++}
++static DEVICE_ATTR_RO(oldrtbuddy_packet_dump);
++
++static int oldrtb_addr_candidate_msg(const char *name, dma_addr_t addr,
++				     u32 packet_len, u64 *msg)
++{
++	u64 a = (u64)addr;
++
++	if (!strcmp(name, "addr64")) {
++		*msg = a;
++		return 0;
++	}
++	if (!strcmp(name, "addr-shift4")) {
++		*msg = a >> 4;
++		return 0;
++	}
++	if (!strcmp(name, "addr-shift12")) {
++		*msg = a >> 12;
++		return 0;
++	}
++	if (!strcmp(name, "addr-len")) {
++		*msg = ((u64)packet_len << 32) | (u32)a;
++		return 0;
++	}
++	if (!strcmp(name, "len-addr")) {
++		*msg = ((u64)(u32)a << 32) | packet_len;
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static ssize_t oldrtbuddy_packet_addr_plan_show(struct device *dev,
++						struct device_attribute *attr,
++						char *buf)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	ssize_t len = 0;
++	size_t i;
++
++	if (!ans)
++		return sysfs_emit(buf, "no-state\n");
++
++	len += sysfs_emit_at(buf, len, "oldrtbuddy_packet_addr_plan=v1\n");
++	len += sysfs_emit_at(buf, len,
++			     "current_packet allocated=%u mode=%s addr=%pad len=0x%zx seq=%u format=0x%02x\n",
++			     !!ans->oldrtb_dma_packet,
++			     ans->oldrtb_dma_coherent ? "coherent" : "phys-fallback",
++			     &ans->oldrtb_dma_addr, ans->oldrtb_packet_len,
++			     ans->oldrtb_packet_seq, ans->oldrtb_packet_format);
++	len += sysfs_emit_at(buf, len,
++			     "last_send name=%s msg=%016llx a2i_ctl=%08x packet_len=0x%x\n",
++			     ans->oldrtb_addr_last[0] ? ans->oldrtb_addr_last : "none",
++			     ans->oldrtb_addr_last_msg,
++			     ans->oldrtb_addr_last_a2i_ctl,
++			     ans->oldrtb_addr_last_len);
++	len += sysfs_emit_at(buf, len,
++			     "usage=echo '<variant> <candidate>' > oldrtbuddy_packet_addr_send\n");
++	len += sysfs_emit_at(buf, len,
++			     "variants=old-small old-0x40\n");
++	for (i = 0; i < ARRAY_SIZE(oldrtb_addr_candidates); i++)
++		len += sysfs_emit_at(buf, len, "candidate=%s desc=%s\n",
++				     oldrtb_addr_candidates[i].name,
++				     oldrtb_addr_candidates[i].desc);
++	len += sysfs_emit_at(buf, len,
++			     "guard=send is refused unless the observed old RTBuddy management loop is stable and AKF A2I is not full\n");
++
++	return len;
++}
++static DEVICE_ATTR_RO(oldrtbuddy_packet_addr_plan);
++
++static ssize_t oldrtbuddy_packet_addr_send_store(struct device *dev,
++						 struct device_attribute *attr,
++						 const char *buf, size_t count)
++{
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
++	const struct t7000_oldrtb_packet_variant *variant;
++	struct t7000_oldrtb_state st;
++	char variant_name[32];
++	char candidate_name[32];
++	u32 a2i_ctl;
++	u64 msg;
++	int ret;
++
++	if (!ans || !ans->regs)
++		return -ENODEV;
++
++	ret = sscanf(buf, "%31s %31s", variant_name, candidate_name);
++	if (ret != 2)
++		return -EINVAL;
++
++	variant = oldrtb_packet_variant_by_name(variant_name);
++	if (!variant)
++		return -EINVAL;
++
++	ret = oldrtb_collect_state(ans, &st, 64);
++	if (ret)
++		return ret;
++	if (!oldrtb_state_is_stable(&st)) {
++		dev_notice(dev,
++			   "T7000 ANS old RTBuddy packet addr send refused: phase=%s seen_mask=%x unknown=%u loop_count=%u\n",
++			   oldrtb_phase_name(st.phase), st.seen_mask,
++			   st.unknown, st.loop_count);
++		return -EAGAIN;
++	}
++
++	ret = oldrtb_stage_packet(ans, variant);
++	if (ret)
++		return ret;
++
++	ret = oldrtb_addr_candidate_msg(candidate_name, ans->oldrtb_dma_addr,
++					ans->oldrtb_packet_len, &msg);
++	if (ret)
++		return ret;
++
++	a2i_ctl = readl(ans->regs + AKF_A2I_CONTROL);
++	if (a2i_ctl & AKF_CONTROL_FULL)
++		return -EBUSY;
++
++	strscpy(ans->oldrtb_addr_last, candidate_name,
++		sizeof(ans->oldrtb_addr_last));
++	ans->oldrtb_addr_last_msg = msg;
++	ans->oldrtb_addr_last_a2i_ctl = a2i_ctl;
++	ans->oldrtb_addr_last_len = ans->oldrtb_packet_len;
++
++	dev_notice(dev,
++		   "T7000 ANS old RTBuddy packet addr send: variant=%s candidate=%s msg=%016llx addr=%pad len=0x%zx a2i_ctl=%08x\n",
++		   variant->name, candidate_name, msg, &ans->oldrtb_dma_addr,
++		   ans->oldrtb_packet_len, a2i_ctl);
++	akf_write_send(ans, msg);
++
++	return count;
++}
++static DEVICE_ATTR_WO(oldrtbuddy_packet_addr_send);
++
 +static ssize_t oldrtbuddy_state_show(struct device *dev,
 +				     struct device_attribute *attr, char *buf)
 +{
@@ -695,7 +1266,7 @@ index 000000000..62b9f0575
 +			     "controller is alive but still cycling in old RTBuddy management; endpoint map/start not reached" :
 +			     "unexpected traffic observed; inspect akf_decode before sending anything");
 +	len += sysfs_emit_at(buf, len,
-+			     "next_code_step=use oldrtbuddy_plan and oldrtbuddy_ordered_reply for gated management replies, then ANSEndpoint1 start before ASPStorage block commands\n");
++			     "next_code_step=reconstruct the old RTBuddy shared-buffer transaction header/callback flow, then start ANSEndpoint1 before ASPStorage block commands\n");
 +
 +	return len;
 +}
@@ -954,6 +1525,13 @@ index 000000000..62b9f0575
 +	dev_notice(dev, "T7000 ANS diag: mmio=%pa..%pa size=%pa\n",
 +		   &res->start, &res->end, &size);
 +
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
++	if (ret)
++		dev_warn(dev, "T7000 ANS diag: 32-bit coherent DMA mask failed: %d\n",
++			 ret);
++	else
++		dev_notice(dev, "T7000 ANS diag: using 32-bit coherent DMA mask\n");
++
 +	for (i = 0; i < 4; i++) {
 +		irq = platform_get_irq_optional(pdev, i);
 +		if (irq < 0)
@@ -1064,8 +1642,141 @@ index 000000000..62b9f0575
 +		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_ordered_reply sysfs file\n");
 +	}
 +
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_transaction_plan sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_transaction);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_transaction sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_packet_model);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_packet_model sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_packet_stage sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_packet_dump sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_packet_addr_plan sysfs file\n");
++	}
++
++	ret = device_create_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
++		device_remove_file(dev, &dev_attr_akf_decode);
++		device_remove_file(dev, &dev_attr_akf_rxpoll);
++		device_remove_file(dev, &dev_attr_rxpoll);
++		device_remove_file(dev, &dev_attr_akf_mbox);
++		device_remove_file(dev, &dev_attr_mbox);
++		device_remove_file(dev, &dev_attr_state);
++		device_remove_file(dev, &dev_attr_regs);
++		return dev_err_probe(dev, ret, "failed to create oldrtbuddy_packet_addr_send sysfs file\n");
++	}
++
 +	ret = device_create_file(dev, &dev_attr_send_raw);
 +	if (ret) {
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
@@ -1082,6 +1793,13 @@ index 000000000..62b9f0575
 +	ret = device_create_file(dev, &dev_attr_akf_send_raw);
 +	if (ret) {
 +		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
@@ -1099,6 +1817,13 @@ index 000000000..62b9f0575
 +	if (ret) {
 +		device_remove_file(dev, &dev_attr_akf_send_raw);
 +		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
@@ -1117,6 +1842,13 @@ index 000000000..62b9f0575
 +		device_remove_file(dev, &dev_attr_akf_send_if_current);
 +		device_remove_file(dev, &dev_attr_akf_send_raw);
 +		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
@@ -1136,6 +1868,13 @@ index 000000000..62b9f0575
 +		device_remove_file(dev, &dev_attr_akf_send_if_current);
 +		device_remove_file(dev, &dev_attr_akf_send_raw);
 +		device_remove_file(dev, &dev_attr_send_raw);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++		device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
 +		device_remove_file(dev, &dev_attr_oldrtbuddy_state);
@@ -1157,12 +1896,20 @@ index 000000000..62b9f0575
 +static void apple_t7000_ans_remove(struct platform_device *pdev)
 +{
 +	struct device *dev = &pdev->dev;
++	struct apple_t7000_ans *ans = dev_get_drvdata(dev);
 +
 +	device_remove_file(dev, &dev_attr_akf_rtkit_wake);
 +	device_remove_file(dev, &dev_attr_rtkit_wake);
 +	device_remove_file(dev, &dev_attr_akf_send_if_current);
 +	device_remove_file(dev, &dev_attr_akf_send_raw);
 +	device_remove_file(dev, &dev_attr_send_raw);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_send);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_packet_addr_plan);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_packet_dump);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_packet_stage);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_packet_model);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_transaction);
++	device_remove_file(dev, &dev_attr_oldrtbuddy_transaction_plan);
 +	device_remove_file(dev, &dev_attr_oldrtbuddy_ordered_reply);
 +	device_remove_file(dev, &dev_attr_oldrtbuddy_plan);
 +	device_remove_file(dev, &dev_attr_oldrtbuddy_state);
@@ -1173,6 +1920,14 @@ index 000000000..62b9f0575
 +	device_remove_file(dev, &dev_attr_mbox);
 +	device_remove_file(dev, &dev_attr_state);
 +	device_remove_file(dev, &dev_attr_regs);
++	if (ans->oldrtb_dma_packet) {
++		if (ans->oldrtb_dma_coherent)
++			dma_free_coherent(dev, ans->oldrtb_dma_size,
++					  ans->oldrtb_dma_packet,
++					  ans->oldrtb_dma_addr);
++		else
++			free_page((unsigned long)ans->oldrtb_dma_packet);
++	}
 +	pm_runtime_put_sync(dev);
 +	pm_runtime_disable(dev);
 +}

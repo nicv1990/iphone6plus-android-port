@@ -40,6 +40,9 @@ This project builds on years of work from other open-source and research communi
 - Finding that A8-era `iop,s5l8960x` devices use the older AKF mailbox path.
 - Comparing the Linux view against iOS ramdisk evidence.
 - Identifying that the real blocker is ANS / RTBuddy / ASPStorage, not a generic Android image.
+- Cross-checking the iPhone 6 Plus schematic and A8-era device teardowns to
+  separate the physical NAND package question from the Apple storage-controller
+  protocol question.
 
 ## Our Current Contribution
 
@@ -56,6 +59,8 @@ That patch adds:
 - ASC and AKF mailbox diagnostics.
 - old RTBuddy state-machine sampling.
 - guarded ordered-reply sysfs path for controlled management experiments.
+- recovered old RTBuddy packet staging diagnostics.
+- guarded packet-address candidate diagnostics showing that a simple mailbox
+  physical-address handoff is insufficient.
 
 All upstream projects remain owned by their respective authors and licenses.
-
